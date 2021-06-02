@@ -3,16 +3,16 @@ Dievas - backend is a C# server for dashboarding.
 
 
 ## Requirements
-- .NET Core version 2.2 or later with command line tools.  You can use `bash dotnet --version` to check the install version
+- .NET Core version 2.2 or later with command line tools.  You can use `$ dotnet --version` to check the installedc version.
 - [Newtonsoft.json](https://www.newtonsoft.com/json) 
 
 ## Installation
 Clone this respository and use the package manager [NuGet](https://nuget.org) to install the requirements.
 
 ```bash
-git clone [https://github.com/porcej/Dievas.git](https://github.com/porcej/Dievas.git)
-cd Dievas
-nuget install Newtonsoft.json
+$ git clone [https://github.com/porcej/Dievas.git](https://github.com/porcej/Dievas.git)
+$ cd Dievas
+$ nuget install Newtonsoft.json
 ```
 
 ## Usage
