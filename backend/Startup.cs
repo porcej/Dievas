@@ -32,6 +32,7 @@ namespace backend
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "backend", Version = "v1" });
             });
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +44,15 @@ namespace backend
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "backend v1"));
             }
+
+            // We setup CORS to allow for our frontend to access this API
+            app.UseCors(builder =>
+                builder
+                    .WithOrigins("http://localhost:8080")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+            );
 
             app.UseHttpsRedirection();
 
