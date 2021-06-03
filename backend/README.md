@@ -1,20 +1,17 @@
-# Dievas 
-Dievas - A Dashboarding solution with a [.NET](https://docs.microsoft.com/en-us/dotnet/csharp/) [backend](./backend/README.md) and a [Vue.js](https://vuejs.org/) [frontend](./frontend/README.md).
+# Dievas - backend
+Dievas - backend is a C# server for dashboarding.
 
 
 ## Requirements
-- backend
-	- .NET Core version 2.2 or later with command line tools.  You can use `$ dotnet --version` to check the installed version.
-	- [Newtonsoft.json](https://www.newtonsoft.com/json) 
-- frontend
-	- Some Future Requirements
+- .NET Core version 2.2 or later with command line tools.  You can use `$ dotnet --version` to check the installed version.
+- [Newtonsoft.json](https://www.newtonsoft.com/json) 
 
 ## Installation
 Clone this respository and use [.NET CLI](https://docs.microsoft.com/en-us/dotnet/core/tools/) to install the requirements.
 
 ```bash
 $ git clone [https://github.com/porcej/Dievas.git](https://github.com/porcej/Dievas.git)
-$ cd Dievas/backend
+$ cd Dievas
 $ dotnet add package Newtonsoft.Json
 ```
 
