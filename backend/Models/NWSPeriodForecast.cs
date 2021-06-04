@@ -24,8 +24,8 @@ namespace backend.Models
 
         public string Icon { get; set; }
 
-        public string shortSummary { get; set; }
+        public string shortForecast { get; set; }
 
-        public string Summary { get; set; }
+        public string detailedForecast { get; set; }
     }
 }
