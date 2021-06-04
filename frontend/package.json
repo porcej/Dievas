@@ -14,7 +14,8 @@
     "jsonp": "^0.2.1",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
-    "vue-skycons": "^4.0.5"
+    "vue-skycons": "^4.0.5",
+    "vue-weathericons": "^0.0.3"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
