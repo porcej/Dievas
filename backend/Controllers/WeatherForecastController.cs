@@ -99,7 +99,8 @@ namespace backend.Controllers
                     NWSPeriodForecast parsedPeriodForecast = periodForecast.ToObject<NWSPeriodForecast>();
                     nwsForecast.Periods.Add(parsedPeriodForecast);
                 }
-                return nwsForecast;
+                currentForecast = nwsForecast;
+                return currentForecast;
             }
             catch (Exception e)
             {
