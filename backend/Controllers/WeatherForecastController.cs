@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using backend.Models;
 using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace backend.Controllers
 {
@@ -22,7 +23,7 @@ namespace backend.Controllers
 
         // We only want to have the most recent forecast, so we will use 
         // in memory (concurrentbag) storage for the latest forecast
-        private static NWSForecast currentForecast = fetchNWSForecast();
+        private static NWSForecast currentForecast = new NWSForecast();
 
         // We will use this to check if we need to update the forecast
         //  by default new DateTime() returns {01/01/0001 00:00:00}
@@ -32,7 +33,7 @@ namespace backend.Controllers
 
         // We could place the logic in this method inside of the get method,
         //  it is pulled out for clarity
-        private static NWSForecast fetchNWSForecast()
+        private static NWSForecast fetchNWSForecast(string baseUrl, string userAgent)
         {
 
             // Check if forecastExpiration is in the future, if so just return current
@@ -51,8 +52,6 @@ namespace backend.Controllers
                 Console.WriteLine(e.Message);
             }
 
-            string baseUrl = "https://api.weather.gov/gridpoints/LWX/96,66/forecast";
-            string userAgent = "(Stack Weather, kt3i.com)";
             string nwsJsonRaw = "";
 
             try
@@ -124,15 +123,18 @@ namespace backend.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        private readonly IConfiguration _config;
+
+        public WeatherForecastController(IConfiguration configuration, ILogger<WeatherForecastController> logger)
         {
+            _config = configuration;
             _logger = logger;
         }
 
         [HttpGet]
         public NWSForecast Get()
         {
-            return fetchNWSForecast();
+            return fetchNWSForecast(_config["NWS:Url"], _config["NWS:User-agent"]);
         }
     }
 }

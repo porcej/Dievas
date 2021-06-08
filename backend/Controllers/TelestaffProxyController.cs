@@ -31,24 +31,11 @@ namespace backend.Controllers
             _logger = logger;
         }
 
-        // public TelestaffProxyController(ILogger<TelestaffProxyController> logger)
-        // {
-        //     _logger = logger;
-        // }
-
         // This can be updated later to provide better logic or tap directly into telestaff
-        private static string fetchRoster(string tsUser, string tsPass, string dUser, string dPass, string date = "")
+        private static string fetchRoster(string baseUrl, string tsUser, string tsPass, string dUser, string dPass, string date = "", string userAgent = "")
         {
-
-            string baseUrl = "https://data.webstaff.xyz/roster/" + date;
-            // Console.WriteLine(_config);
-            // var test = Configuration.GetSection("Telestaff").Get("Username");
-            
-            //             _TelestaffUsername = 
-
-            string userAgent = "(Stack Weather, kt3i.com)";
+            baseUrl = $"{baseUrl}{date}";
             string rawTelestaffData= "{\"status_code\": 500, \"data\": \"Something went wrong.\"}";
-
             try
             {
                 WebClient client = new WebClient();
@@ -72,12 +59,13 @@ namespace backend.Controllers
         [HttpGet]
         public string Get()
         {
-            Console.WriteLine(_config["Telestaff:Username"]);
             return fetchRoster(
-                    _config["Telestaff:Username"],
-                    _config["Telestaff:Password"],
-                    _config["Domain:Username"],
-                    _config["Domain:Password"]
+                    baseUrl: _config["Telestaff:Url"],
+                    tsUser: _config["Telestaff:Username"],
+                    tsPass: _config["Telestaff:Password"],
+                    dUser: _config["Domain:Username"],
+                    dPass: _config["Domain:Password"],
+                    userAgent: _config["Telestaff:User-agent"]
                 );
         }
 
@@ -85,11 +73,13 @@ namespace backend.Controllers
         public string GetRosterByDate(string date)
         {
             return fetchRoster(
-                    _config["Telestaff:Username"],
-                    _config["Telestaff:Password"],
-                    _config["Domain:Username"],
-                    _config["Domain:Password"],
-                    date
+                    baseUrl: _config["Telestaff:Url"],
+                    tsUser: _config["Telestaff:Username"],
+                    tsPass: _config["Telestaff:Password"],
+                    dUser: _config["Domain:Username"],
+                    dPass: _config["Domain:Password"],
+                    date: date,
+                    userAgent: _config["Telestaff:User-agent"]
                 );
         }
     }
