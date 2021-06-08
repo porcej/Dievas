@@ -28,7 +28,6 @@ namespace backend.Controllers
         public TelestaffProxyController(IConfiguration configuration, ILogger<TelestaffProxyController> logger)
         {
             _config = configuration;
-            Console.WriteLine(_config["Telestaff:Username"]);
             _logger = logger;
         }
 
