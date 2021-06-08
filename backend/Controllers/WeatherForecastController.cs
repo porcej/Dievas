@@ -50,27 +50,31 @@ namespace backend.Controllers
             {
                 Console.WriteLine(e.Message);
             }
-            
 
             string baseUrl = "https://api.weather.gov/gridpoints/LWX/96,66/forecast";
             string userAgent = "(Stack Weather, kt3i.com)";
+            string nwsJsonRaw = "";
 
-            WebClient client = new WebClient();
-            client.Headers.Add("User-agent", userAgent);
-            Stream data = client.OpenRead(baseUrl);
+            try
+            {
+                WebClient client = new WebClient();
+                client.Headers.Add("User-agent", userAgent);
+                Stream data = client.OpenRead(baseUrl);
+                
+                StreamReader reader = new StreamReader(data);
+                nwsJsonRaw = reader.ReadToEnd();
+                data.Close();
+                reader.Close();
 
-            StreamReader reader = new StreamReader(data);
-            string nwsJsonRaw = reader.ReadToEnd();
-            data.Close();
-            reader.Close();
+                // Here we set the forecast expiration
+                WebHeaderCollection myWebHeaderCollection = client.ResponseHeaders;  
+                forecastExpiration = DateTime.Parse(client.ResponseHeaders["Expires"]);
 
+            } catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
-            // Here we set the forecast expiration
-            WebHeaderCollection myWebHeaderCollection = client.ResponseHeaders;
-
-
-
-            forecastExpiration = DateTime.Parse(client.ResponseHeaders["Expires"]);
             try
             {
                 // First we Parse the NWS Returne JSON
