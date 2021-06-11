@@ -1,0 +1,129 @@
+ [data-shift="a"].vwt__title {
+  color: #d9534f;
+  text-shadow: 0 0 2px #d9534f;
+}
+
+[data-shift="b"].vwt__title {
+  color: #5cb85c;
+  text-shadow: 0 0 2px #5cb85c;
+}
+
+[data-shift="c"].vwt__title {
+  color: #ccc;
+  text-shadow: 0 0 2px #ccc;
+}
+
+.vwt__telestaff {
+  padding:  10px;
+  font-family: 'Frutiger CE 55 Roman';;
+}
+
+ul {
+  text-align:  left;
+}
+
+.vwt__interval {
+  float:right ;
+}
+
+ul.vwt__roster, ul.vwt__positions {
+  list-style: none;
+  margin-top:  5px;
+}
+
+.vwt__position svg {
+  margin-right: 10px;
+}
+
+.vwt__unit_title {
+  font-size:  28px;
+  font-weight: bold;
+}
+
+.vwt__unit_activities, .vwt__position {
+  font-size:  22px;
+}
+
+.vwt__telestaff {
+  display:  block;
+  width:  49%;
+  font-size: 18px;
+  color:  #CCC;
+}
+
+.vwt__interval {
+  display: block;
+  text-align: center;
+  width:  130px;
+}
+
+/* Define an animation behavior */
+@keyframes spinner {
+  to { transform: rotate(360deg); }
+}
+/* This is the class name given by the Font Awesome component when icon contains 'spinner' */
+.fa-spinner {
+  /* Apply 'spinner' keyframes looping once every second (1s)  */
+  animation: spinner 1s linear infinite;
+}
+
+.vwt__title {
+  text-align: center;
+  /*font-size: 20vmin;*/
+  font-size: 30px;
+  font-family: "Share Tech Mono", monospace;
+  /*font-family: "Digital-7 Mono";*/
+  /*color: rgb(200, 20, 0);*/
+  line-height: 1em;
+  vertical-align: middle;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.vwt__loading {
+  text-align: center;
+  /*font-size: 20vmin;*/
+  font-size: 30px;
+  font-family: "Share Tech Mono", monospace;
+  /*font-family: "Digital-7 Mono";*/
+  /*color: rgb(200, 20, 0);*/
+  line-height: 1em;
+  vertical-align: middle;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+.vwt_loading .vwt__title {
+  margin:  auto;
+  font-size:  50px;
+}
+
+.vwt__telestaff {
+  height: 100%;
+  width:  100%;
+}
+
+/*  The following is to support 720p displays*/
+@media (max-height: 720px){
+  .vwt__title {
+    font-size: 22px;
+  }
+
+  .vwt__unit_title {
+  font-size:  20px;
+  font-weight: bold;
+}
+
+.vwt__unit_activities, .vwt__position {
+  font-size:  16px;
+}
+
+  .vwt__telestaff {
+    font-size:  16px;
+  }
+}
+
