@@ -7,6 +7,13 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
+    // name: "Home",
+    // component: Home,
+    name: "Dashboard",
+    component: () => import("../views/Dash.vue"),
+  },
+  {
+    path: "/home",
     name: "Home",
     component: Home,
   },

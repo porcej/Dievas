@@ -1,13 +1,11 @@
 import Utils from "./utils";
 import WeatherIcons from "vue-weathericons";
-import ShiftDate from "@/components/VueShiftDate";
 
 export default {
   name: "VueWeatherWidget",
 
   components: {
     WeatherIcons,
-    ShiftDate,
   },
 
   props: {
