@@ -94,6 +94,11 @@ const utils = {
     };
   },
 
+  getDeltaDay(delta = 1) {
+    const tomorrow = moment().add(delta, "days");
+    return tomorrow.format("YYYYMMDD");
+  },
+
   getTodayOrDayName(date) {
     if (date.isSame(moment(), "day")) {
       return "Today";

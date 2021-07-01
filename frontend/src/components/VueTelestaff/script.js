@@ -141,10 +141,16 @@ export default {
     },
 
     loadRoster() {
+      const date =
+        this.date == "tomorrow"
+          ? Utils.getDeltaDay()
+          : this.date == "yesterday"
+          ? Utils.getDeltaDay(-1)
+          : this.date;
       return Utils.fetchRoster({
         url: this.url,
         station: this.station,
-        date: this.date,
+        date: date,
       }).then((data) => {
         this.$set(this, "roster", data);
       });

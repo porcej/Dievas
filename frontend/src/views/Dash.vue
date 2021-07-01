@@ -14,7 +14,7 @@
         <!-- 900000ms = 15 minutes -->
         <vue-telestaff
           station="Station 209"
-          date="20210614"
+          date="tomorrow"
           :updateInterval="15 * 60 * 1000"
         />
       </b-col>
