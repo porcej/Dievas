@@ -7,15 +7,15 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    // name: "Home",
-    // component: Home,
-    name: "Dashboard",
-    component: () => import("../views/Dash.vue"),
-  },
-  {
-    path: "/home",
     name: "Home",
     component: Home,
+    // name: "Dashboard",
+    // component: () => import("../views/Dash.vue"),
+  },
+  {
+    path: "/station/:stationId",
+    name: "Dashboard",
+    component: () => import("../views/Dash.vue"),
   },
   {
     path: "/about",
@@ -28,7 +28,7 @@ const routes = [
   },
   {
     path: "/dash",
-    name: "Dashboard",
+    name: "Dash",
     component: () => import("../views/Dash.vue"),
   },
 ];

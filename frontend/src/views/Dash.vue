@@ -5,7 +5,7 @@
       <b-col :style="wxContentStyle">
         <!-- 900000ms = 15 minutes -->
         <vue-telestaff
-          station="Station 209"
+          :station="$route.params.stationId"
           :updateInterval="15 * 60 * 1000"
           title="Today"
         />
@@ -13,7 +13,7 @@
       <b-col :style="wxContentStyle">
         <!-- 900000ms = 15 minutes -->
         <vue-telestaff
-          station="Station 209"
+          :station="$route.params.stationId"
           date="tomorrow"
           :updateInterval="15 * 60 * 1000"
         />
