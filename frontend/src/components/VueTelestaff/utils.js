@@ -78,7 +78,9 @@ const utils = {
       date: shiftDate,
       shift: shift.title.split(" ")[1].toLowerCase(),
       station: stationRoster.title,
-      units: stationRoster["Unit"],
+      units: stationRoster["Unit"].filter(
+        (unit) => unit.title !== "{off roster}"
+      ),
       activities: stationRoster["Unit"].reduce((activites, unit) => {
         if (unit.notes !== "") {
           activites.push(

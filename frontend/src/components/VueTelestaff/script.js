@@ -149,7 +149,7 @@ export default {
           : this.date;
       return Utils.fetchRoster({
         url: this.url,
-        station: this.station,
+        station: "Station " + this.station,
         date: date,
       }).then((data) => {
         this.$set(this, "roster", data);
