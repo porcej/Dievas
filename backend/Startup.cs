@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WebEssentials.AspNetCore.OutputCaching;
+using backend.Hubs;
 
 namespace backend
 {
@@ -76,6 +77,7 @@ namespace backend
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<DashboardHub>("/dashboardHub");
             });
         }
     }
