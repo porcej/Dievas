@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WebEssentials.AspNetCore.OutputCaching;
 
 namespace backend
 {
@@ -27,6 +28,14 @@ namespace backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOutputCaching(options =>
+            {
+                options.Profiles["default"] = new OutputCacheProfile
+                {
+                    Duration = 10,
+                    VaryByParam="eventId"
+                };
+            });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -46,10 +55,13 @@ namespace backend
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "backend v1"));
             }
 
+            // Split the Origins string by semi-colin to allow multiple origins
+            string[] origins = Configuration["Origins"].Split(";");
+
             // We setup CORS to allow for our frontend to access this API
             app.UseCors(builder =>
                 builder
-                    .WithOrigins("http://localhost:8080")
+                    .WithOrigins(origins)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials()
