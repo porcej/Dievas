@@ -1,5 +1,5 @@
-# Dievas - Backend
-Dievas - Backend is a C# server for dashboarding.
+# Dievas - backend
+Dievas - backend is a C# server for dashboarding.
 
 
 ## Requirements

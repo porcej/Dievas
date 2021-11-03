@@ -1,54 +1,59 @@
-﻿ng Microsoft.AspNetCore.SignalR;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend.Models;
+using Microsoft.AspNetCore.SignalR;
 
-namespace Backend.Hubs
-{
-  public class DashboardHub : Hub
-  {
+namespace Backend.Hubs {
 
-    public async Task Subscribe(string groupName)
-    {
-      await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-    }
-
-    public async Task Unsubscribe(string groupName)
-    {
-      await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+    public interface IDashboardHub {
+        Task IncidentAdded(Incident incident);
+        Task IncidentFieldChanged(int incidentId, string field, string value);
+        Task IncidentUnitStatusChanged(int incidentId, AssignedUnit unit);
+        Task IncidentCommentAdded(int incidentId, Comment comment);
+        Task UnitStatusChanged(string radioName, int statusId);
+        Task UnitHomeChanged(string radioName, string homeStation);
     }
 
-    //aliases for Subscribe methods
-    public async Task JoinIncidentGroup(string incidentId)
-    {
-      await Subscribe(incidentId);
-    }
+    //  Here we handle general client communications
+    public class DashboardHub: Hub<IDashboardHub> {
 
-    public async Task LeaveIncidentGroup(string incidentId)
-    {
-      await Unsubscribe(incidentId);
-    }
-    public async Task SendMessage(string sender, string message)
-    {
-      await Clients.All.SendAsync("ReceiveMessage", sender, message);
-    }
-    public async Task SendMessageToGroup(string groupName, string sender, string message)
-    {
-      await SendActionToGroup("ReceiveGroupMessage", groupName, sender, message);
-    }
-    public async Task SendActionToGroup(string action, string groupName, string sender, string message)
-    {
-      switch (action)
-      {
-        case "IncidentAdded":
-          await Clients.Group(groupName).SendAsync("IncidentAdded", message);
-          break;
-        default:
-          await Clients.Group(groupName).SendAsync(action, groupName, sender, message);
-          break;
-      }
+        // Handle clients connecting
+        public async Task JoinDashboard() {
+            await Groups.AddToGroupAsync(Context.ConnectionId, "dashboard");
+        }
 
+        // Handle clients disconnecting
+        public async Task LeaveDashboard() {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId,
+                                              "dashboard");
+        }
+
+        // Add clients to an incident 
+        public async Task JoinIncidentGroup(int incidentId){
+            await Groups.AddToGroupAsync(Context.ConnectionId,
+                                         incidentId.ToString());
+        }
+
+        // Remove clients from an incident
+        public async Task LeaveIncidentGroup(int incidentId)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, 
+                                              incidentId.ToString());
+        }
+
+        // // Handle upstream data sources subscribing to push data
+        // public async Task JoinDataFeed()
+        // {
+        //     await Groups.AddToGroupAsync(Context.ConnectionId, "dataFeed");
+        // }
+
+        // // Handle upstream data sources disconnecting
+        // public async Task LeaveDataFeed()
+        // {
+        //     await Groups.RemoveFromGroupAsync(Context.ConnectionId, "dataFeed");
+        // }
+        // // public async Task JoinCADGroup()
     }
-  }
 }
