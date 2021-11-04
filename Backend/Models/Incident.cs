@@ -29,5 +29,13 @@ namespace Backend.Models {
         public DateTime incidentEndTime { get; set; }
         public List<Comment> Comments { get; set; }
         public List<AssignedUnit> Units { get; set; }
+
+        public override bool Equals(Object obj) {
+            return (obj is Incident) && ((Incident)obj).id == id;
+        }
+     
+        public override int GetHashCode() {
+            return id.GetHashCode();
+        }
     }
 }

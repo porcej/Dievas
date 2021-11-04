@@ -19,5 +19,13 @@ namespace Backend.Models {
         public string Heading { get; set; }
         public int Altitude { get; set; }
         public DateTime LastAVLUpdate { get; set; }
+
+        public override bool Equals(Object obj) {
+            return (obj is Unit) && ((Unit)obj).radioName == radioName;
+        }
+     
+        public override int GetHashCode() {
+            return radioName.GetHashCode();
+        }
     }
 }

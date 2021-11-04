@@ -9,5 +9,13 @@ namespace Backend.Models {
         public string cautionNotePriority { get; set; }
         public int sequenceNumber { get; set; }
         public int commentCategoryID { get; set; }
+
+        public override bool Equals(Object obj) {
+            return (obj is Comment) && ((Comment)obj).id == id;
+        }
+
+        public override int GetHashCode() {
+            return rid;
+        }
     }
 }
