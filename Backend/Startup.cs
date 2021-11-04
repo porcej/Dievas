@@ -12,8 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using WebEssentials.AspNetCore.OutputCaching;
-
 
 namespace Backend {
 
@@ -28,15 +26,6 @@ namespace Backend {
         // This method gets called by the runtime. Use this method to add
         //      services to the container.
         public void ConfigureServices(IServiceCollection services) {
-
-            // Uncomment below to enable output cacheing
-            // services.AddOutputCaching(options => {
-            //     options.Profiles["default"] = new OutputCacheProfile {
-            //         Duration = 10,
-            //         VaryByParam="eventId"
-            //     };
-            // });
-            
             services.AddControllers();
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { 
@@ -46,6 +35,7 @@ namespace Backend {
             });
             services.AddSignalR();
             services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton<CAD>();
         }
 
         // This method gets called by the runtime. Use this method to configure
