@@ -108,7 +108,7 @@ namespace Backend.Controllers {
         // TEST FUNCTIONS PLEASE REMOVE
         [HttpGet("test")]
         public async Task<Incident> GenerateTestIncident() {
-            var _nextCount = _cad._incidents.Count + 1;
+            var _nextCount = _cad.IncidentCount() + 1;
             var _incident = new Incident {
                 id = _nextCount,
                 active = true,

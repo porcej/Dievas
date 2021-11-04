@@ -40,18 +40,6 @@ namespace Backend.Hubs {
         public async Task JoinIncidentGroup(int incidentId){
             await Groups.AddToGroupAsync(Context.ConnectionId,
                                          incidentId.ToString());
-
-            if (_cad._incidents.ContainsKey(incidentId)) {
-                string _field = "incidentType";
-                string _value = "MONKEY";
-
-                _cad._incidents[incidentId].incidentType = _value;
-
-            
-                await Clients
-                          .Group(incidentId.ToString())
-                          .IncidentFieldChanged(incidentId, _field, _value);
-            }
         }
 
         // Remove clients from an incident
