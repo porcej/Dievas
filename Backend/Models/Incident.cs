@@ -6,36 +6,36 @@ using System.Threading.Tasks;
 namespace Backend.Models {
     
     public class Incident {
-        public int id { get; set; }
-        public bool active { get; set; }
-        public string jurisdiction { get; set; }
-        public string incidentType { get; set; }
+        public int Id { get; set; }
+        public bool Active { get; set; }
+        public string Jurisdiction { get; set; }
+        public string IncidentType { get; set; }
         public string LocationName { get; set; }
-        public string address { get; set; }
-        public string apartment { get; set; }
-        public string city { get; set; }
-        public string state { get; set; }
-        public string postalCode { get; set; }
-        public string county { get; set; }
-        public string locationType { get; set; }
-        public double longitude { get; set; }
-        public double latitude { get; set; }
-        public string crossStreet { get; set; }
-        public string commandChannel { get; set; }
-        public string primaryTACChannel { get; set; }
-        public string alternateTACChannel { get; set; }
-        public string callDisposition { get; set; }
-        public DateTime incidentStartTime { get; set; }
-        public DateTime incidentEndTime { get; set; }
+        public string Address { get; set; }
+        public string Apartment { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string PostalCode { get; set; }
+        public string County { get; set; }
+        public string LocationType { get; set; }
+        public double Longitude { get; set; }
+        public double Latitude { get; set; }
+        public string CrossStreet { get; set; }
+        public string CommandChannel { get; set; }
+        public string PrimaryTacChannel { get; set; }
+        public string AlternateTacChannel { get; set; }
+        public string CallDisposition { get; set; }
+        public DateTime IncidentStartTime { get; set; }
+        public DateTime IncidentEndTime { get; set; }
         public List<Comment> Comments { get; set; }
         public List<AssignedUnit> Units { get; set; }
 
         public override bool Equals(Object obj) {
-            return (obj is Incident) && ((Incident)obj).id == id;
+            return (obj is Incident) && ((Incident)obj).Id == Id;
         }
      
         public override int GetHashCode() {
-            return id.GetHashCode();
+            return Id.GetHashCode();
         }
     }
 }

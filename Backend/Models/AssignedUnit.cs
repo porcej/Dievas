@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 namespace Backend.Models {
 
     public class AssignedUnit {
-        public string radioName { get; set; }
-        public int statusId { get; set; }
+        public string RadioName { get; set; }
+        public int StatusId { get; set; }
 
         public override bool Equals(Object obj) {
-            return (obj is AssignedUnit) && ((AssignedUnit)obj).radioName == radioName;
+            return (obj is AssignedUnit) && ((AssignedUnit)obj).RadioName == RadioName;
         }
  
         public override int GetHashCode() {
-            return radioName.GetHashCode();
+            return RadioName.GetHashCode();
         }
     }
 }

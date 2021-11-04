@@ -13,11 +13,11 @@ namespace Backend {
 		private readonly ConcurrentDictionary<int, Incident> _incidents = new ConcurrentDictionary<int, Incident>();
 
 		public IEnumerable GetIncidents() {
-            return _incidents.Values.OrderBy( t => t.id );
+            return _incidents.Values.OrderBy( t => t.Id );
         }
 
         public IEnumerable GetActiveIncidents() {
-            return _incidents.Values.Where(t => t.active).OrderBy( t => t.id );
+            return _incidents.Values.Where(t => t.Active).OrderBy( t => t.Id );
         }
 
         public Incident GetIncident(int id) {
@@ -35,7 +35,7 @@ namespace Backend {
 		// We don't do incident # checking here, for the case where we want to add
 		// an existing incident with new and or updated data
 		public Incident AddIncident(Incident incident){
-			int id = incident.id;
+			int id = incident.Id;
 			_incidents[id] = incident;
 			return incident;
 		}
@@ -50,64 +50,64 @@ namespace Backend {
 
 		    switch (field) {
 		        case "active":
-		            incident.active = (value.ToLower() == "true");
+		            incident.Active = (value.ToLower() == "true");
 		            break;
 		        case "jurisdiction":
-		            incident.jurisdiction = value;
+		            incident.Jurisdiction = value;
 		            break;
 		        case "incidentType":
-		            incident.incidentType = value;
+		            incident.IncidentType = value;
 		            break; 
 		        case "LocationName":
 		            incident.LocationName = value;
 		            break; 
 		        case "address":
-		            incident.address = value;
+		            incident.Address = value;
 		            break; 
 		        case "apartment":
-		            incident.apartment = value;
+		            incident.Apartment = value;
 		            break; 
 		        case "city":
-		            incident.city = value;
+		            incident.City = value;
 		            break; 
 		        case "state":
-		            incident.state = value;
+		            incident.State = value;
 		            break; 
 		        case "postalCode":
-		            incident.postalCode = value;
+		            incident.PostalCode = value;
 		            break; 
 		        case "county":
-		            incident.county = value;
+		            incident.County = value;
 		            break; 
 		        case "locationType":
-		            incident.locationType = value;
+		            incident.LocationType = value;
 		            break; 
 		        case "crossStreet":
-		            incident.crossStreet = value;
+		            incident.CrossStreet = value;
 		            break; 
 		        case "commandChannel":
-		            incident.commandChannel = value;
+		            incident.CommandChannel = value;
 		            break; 
 		        case "primaryTACChannel":
-		            incident.primaryTACChannel = value;
+		            incident.PrimaryTacChannel = value;
 		            break; 
 		        case "alternateTACChannel":
-		            incident.alternateTACChannel = value;
+		            incident.AlternateTacChannel = value;
 		            break; 
 		        case "callDisposition":
-		            incident.callDisposition = value;
+		            incident.CallDisposition = value;
 		            break;
 		        case "longitude":
-		            incident.longitude = Convert.ToDouble(value);
+		            incident.Longitude = Convert.ToDouble(value);
 		            break;
 		        case "latitude":
-		            incident.latitude = Convert.ToDouble(value);
+		            incident.Latitude = Convert.ToDouble(value);
 		            break;
 		        case "incidentStartTime":
-		            incident.incidentStartTime = DateTime.Parse(value);
+		            incident.IncidentStartTime = DateTime.Parse(value);
 		            break;
 		        case "incidentEndTime":
-		            incident.incidentEndTime = DateTime.Parse(value);
+		            incident.IncidentEndTime = DateTime.Parse(value);
 		            break;
 		    }
 			_incidents[id] = incident;		    

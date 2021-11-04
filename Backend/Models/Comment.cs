@@ -3,19 +3,19 @@
 namespace Backend.Models {
     
     public class Comment {
-        public int id { get; set; }
-        public DateTime dateTime { get; set; }
-        public string commentText { get; set; }
-        public string cautionNotePriority { get; set; }
-        public int sequenceNumber { get; set; }
-        public int commentCategoryID { get; set; }
+        public int Id { get; set; }
+        public DateTime DateTime { get; set; }
+        public string CommentText { get; set; }
+        public string CautionNotePriority { get; set; }
+        public int SequenceNumber { get; set; }
+        public int CommentCategoryID { get; set; }
 
         public override bool Equals(Object obj) {
-            return (obj is Comment) && ((Comment)obj).id == id;
+            return (obj is Comment) && ((Comment)obj).Id == Id;
         }
 
         public override int GetHashCode() {
-            return id;
+            return Id;
         }
     }
 }

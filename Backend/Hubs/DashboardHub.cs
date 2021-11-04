@@ -45,7 +45,7 @@ namespace Backend.Hubs {
                 string _field = "incidentType";
                 string _value = "MONKEY";
 
-                _cad._incidents[incidentId].incidentType = _value;
+                _cad._incidents[incidentId].IncidentType = _value;
 
             
                 await Clients
@@ -102,8 +102,8 @@ namespace Backend.Hubs {
 
         public async Task AddNewIncidentWithOneUnitInTheDispatchedStatus(int incidentId, string radioName){
             Incident incident = new Incident {
-                id = incidentId,
-                Units = new List<AssignedUnit>{ new AssignedUnit { radioName = radioName, statusId = 1 } }
+                Id = incidentId,
+                Units = new List<AssignedUnit>{ new AssignedUnit { RadioName = radioName, StatusId = 1 } }
             };
 
             await Clients.Group("dashboard").IncidentAdded(incident);

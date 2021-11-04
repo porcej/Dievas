@@ -110,29 +110,29 @@ namespace Backend.Controllers {
         public async Task<Incident> GenerateTestIncident() {
             var _nextCount = _cad._incidents.Count + 1;
             var _incident = new Incident {
-                id = _nextCount,
-                active = true,
-                jurisdiction = "200 ALX",
-                incidentType = "FIRE-LOCAL ALARM",
+                Id = _nextCount,
+                Active = true,
+                Jurisdiction = "200 ALX",
+                IncidentType = "FIRE-LOCAL ALARM",
                 LocationName = "ALEXANDRIA FIRE STATION 204",
-                address = _nextCount.ToString(),
-                apartment = "",
-                city = "CITY OF ALEXANDRIA",
-                state = "VA",
-                postalCode = "22314",
-                county = "Alexandria",
-                locationType = "Government or Public Building",
-                longitude = -77.0467847,
-                latitude = 38.8163701,
-                crossStreet = "POWHATAN ST",
-                commandChannel = "",
-                primaryTACChannel = "2 BRAVO",
-                alternateTACChannel = "",
-                callDisposition = "",
-                incidentStartTime = DateTime.Now,
+                Address = _nextCount.ToString(),
+                Apartment = "",
+                City = "CITY OF ALEXANDRIA",
+                State = "VA",
+                PostalCode = "22314",
+                County = "Alexandria",
+                LocationType = "Government or Public Building",
+                Longitude = -77.0467847,
+                Latitude = 38.8163701,
+                CrossStreet = "POWHATAN ST",
+                CommandChannel = "",
+                PrimaryTacChannel = "2 BRAVO",
+                AlternateTacChannel = "",
+                CallDisposition = "",
+                IncidentStartTime = DateTime.Now,
                 // incidentEndTime = "",
-                Comments = new List<Comment>{ new Comment { id = 0, commentText = "incident notes here"}},
-                Units = new List<AssignedUnit>{ new AssignedUnit { radioName = "E204", statusId = 1 } }
+                Comments = new List<Comment>{ new Comment { Id = 0, CommentText = "incident notes here"}},
+                Units = new List<AssignedUnit>{ new AssignedUnit { RadioName = "E204", StatusId = 1 } }
             };
 
             return await this.AddIncidentById(_nextCount, _incident);
@@ -156,14 +156,14 @@ namespace Backend.Controllers {
         [HttpGet("testUnit")]
         public async Task<Incident> GenerateTestUnit() {
             var _id = 1;
-            var _unit = new AssignedUnit { radioName = "*200*", statusId = 1 };
+            var _unit = new AssignedUnit { RadioName = "*200*", StatusId = 1 };
             return await this.UpdateIncidentUnits(_id, _unit);
         }
 
         [HttpGet("testUnitUpdate/{unit}")]
         public async Task<Incident> GenerateTestUnitUpdate(string unit) {
             var _id = 1;
-            var _unit = new AssignedUnit { radioName = unit, statusId = 5 };
+            var _unit = new AssignedUnit { RadioName = unit, StatusId = 5 };
             return await this.UpdateIncidentUnits(_id, _unit);
         }
 

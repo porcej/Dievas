@@ -86,11 +86,11 @@ namespace Backend.Controllers {
 
                 // Create an instance of NWSForecast to hold the NWS Forecast Data
                 NWSForecast nwsForecast = new NWSForecast {
-                    updated = (DateTime)nwsJsonObj["properties"]["updated"],
+                    Updated = (DateTime)nwsJsonObj["properties"]["updated"],
                     Units = nwsJsonObj["properties"]["units"].ToString(),
-                    forecastGenerator = nwsJsonObj["properties"]["forecastGenerator"].ToString(),
-                    generatedAt = (DateTime)nwsJsonObj["properties"]["generatedAt"],
-                    updateTime = (DateTime)nwsJsonObj["properties"]["updateTime"],
+                    ForecastGenerator = nwsJsonObj["properties"]["forecastGenerator"].ToString(),
+                    GeneratedAt = (DateTime)nwsJsonObj["properties"]["generatedAt"],
+                    UpdateTime = (DateTime)nwsJsonObj["properties"]["updateTime"],
                     
                     // Newtonsoft.JSON does not do a good job at parsing 
                     // durations, so we will address this later
