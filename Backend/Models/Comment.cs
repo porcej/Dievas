@@ -15,7 +15,7 @@ namespace Backend.Models {
         }
 
         public override int GetHashCode() {
-            return rid;
+            return id;
         }
     }
 }
