@@ -10,8 +10,7 @@ namespace Backend {
 	
 	public class CAD {
 
-		// private readonly ConcurrentDictionary<int, Incident> _incidents = new ConcurrentDictionary<int, Incident>();
-		public ConcurrentDictionary<int, Incident> _incidents = new ConcurrentDictionary<int, Incident>();
+		private readonly ConcurrentDictionary<int, Incident> _incidents = new ConcurrentDictionary<int, Incident>();
 
 		public IEnumerable GetIncidents() {
             return _incidents.Values.OrderBy( t => t.id );
