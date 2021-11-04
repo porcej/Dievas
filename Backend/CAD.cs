@@ -145,5 +145,9 @@ namespace Backend {
             _incidents[id] = incident;
             return incident;
 		}
+
+		public int IncidentCount() {
+			return _incidents.Count;
+		}
 	}
 }
