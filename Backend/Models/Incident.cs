@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Backend.Models {
@@ -36,6 +37,18 @@ namespace Backend.Models {
      
         public override int GetHashCode() {
             return Id.GetHashCode();
+        }
+
+        public static Incident FromJson(string json)
+        {
+
+            var rawIncident = JsonDocument.Parse(json);
+            Incident incident = new Incident();
+            incident.Id = rawIncident.RootElement.GetProperty("MultiAgencyPointer").GetInt32();
+            incident.IncidentType = rawIncident.RootElement.GetProperty("ProblemType").GetProperty("Problem").GetString();
+            return incident;
+        
+
         }
     }
 }

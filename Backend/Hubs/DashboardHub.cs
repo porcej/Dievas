@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Backend.Models;
 using Microsoft.AspNetCore.SignalR;
@@ -63,6 +65,18 @@ namespace Backend.Hubs {
         public async Task LeaveDataFeed() {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "dataFeed");
         }
+
+        //
+        // CADEventListener dataFeed methods
+        //
+
+        public async Task AddIncident(string incidentPayload)
+        {
+            var incident = Incident.FromJson(incidentPayload);
+            Console.WriteLine(incident.IncidentType);
+            _cad.AddIncident(incident);
+        }
+
         // public async Task JoinCADGroup()
 
         // ***************************************************************************************\
@@ -88,6 +102,7 @@ namespace Backend.Hubs {
 
         // The following are example hooks
 
+        
         public async Task AddNewIncidentWithOneUnitInTheDispatchedStatus(int incidentId, string radioName){
             Incident incident = new Incident {
                 Id = incidentId,
