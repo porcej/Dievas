@@ -12,6 +12,25 @@ namespace Backend {
 
 		private readonly ConcurrentDictionary<int, Incident> _incidents = new ConcurrentDictionary<int, Incident>();
 
+		private readonly ConcurrentDictionary<string, Unit> _units = new ConcurrentDictionary<string, Unit>();
+
+		public IEnumerable GetUnits() {
+			return _units.Values.OrderBy( t => t.radioName );
+		}
+
+		public IEnumerable GetUnitsByStation(string station) {
+			return _units.Values.Where(t => t.HomeStation == station).OrderBy( t => t.radioName );
+		}
+
+		public Unit GetUnitByName(string radioName){
+			if (_units.ContainsKey(radioName)) return _units[radioName];
+        	return new Unit();
+		}
+
+		public void AddOrUpdateUnit(Unit unit){
+			_units[unit.radioName] = unit;
+		}
+
 		public IEnumerable GetIncidents() {
             return _incidents.Values.OrderBy( t => t.id );
         }
