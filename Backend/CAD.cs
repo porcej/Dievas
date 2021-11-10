@@ -12,6 +12,10 @@ namespace Backend {
 
 		private readonly ConcurrentDictionary<int, Incident> _incidents = new ConcurrentDictionary<int, Incident>();
 
+
+		public event EventHandler<CadEventArgs> IncidentAdded;
+		public event EventHandler<CadEventArgs> IncidentChanged;
+
 		public IEnumerable GetIncidents() {
             return _incidents.Values.OrderBy( t => t.Id );
         }
@@ -40,9 +44,36 @@ namespace Backend {
 			return incident;
 		}
 
-		// Update incident Field - any updates, we copy out the value, make the update
-		// return the value to the dict
-		public Incident UpdateIncidentField(int id, string field, string value){
+		public Incident AddOrUpdateIncident(Incident incident){
+			if (_incidents.ContainsKey(incident.Id)){
+				_incidents[incident.Id] = incident;
+				OnIncidentEvent(new CadEventArgs { EventType = "IncidentChanged", IncidentId = incident.Id});
+			}else{
+				int id = incident.Id;
+				_incidents[id] = incident;
+				OnIncidentEvent(new CadEventArgs { EventType = "IncidentAdded", IncidentId = incident.Id});
+			}
+			return incident;
+		}
+
+    private void OnIncidentEvent(CadEventArgs cadEventArgs)
+    {
+      switch (cadEventArgs.EventType)
+			{
+					case"IncidentAdded":
+						IncidentAdded?.Invoke(this, cadEventArgs);
+						break;
+					case "IncidentChanged":
+						IncidentChanged?.Invoke(this, cadEventArgs);
+						break;
+					default:
+						break;
+			}
+    }
+
+    // Update incident Field - any updates, we copy out the value, make the update
+    // return the value to the dict
+    public Incident UpdateIncidentField(int id, string field, string value){
 
 			Incident incident = new Incident {};
 
@@ -150,4 +181,10 @@ namespace Backend {
 			return _incidents.Count;
 		}
 	}
+
+  public class CadEventArgs : EventArgs
+  {
+		public string EventType {get;set;}
+		public int IncidentId {get;set;}
+  }
 }

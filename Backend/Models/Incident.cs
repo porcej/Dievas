@@ -44,8 +44,8 @@ namespace Backend.Models {
 
             var rawIncident = JsonDocument.Parse(json);
             Incident incident = new Incident();
-            incident.Id = rawIncident.RootElement.GetProperty("MultiAgencyPointer").GetInt32();
-            incident.IncidentType = rawIncident.RootElement.GetProperty("ProblemType").GetProperty("Problem").GetString();
+            incident.Id = rawIncident.RootElement.GetProperty("Id").GetInt32();
+            incident.IncidentType = rawIncident.RootElement.GetProperty("Problem").GetString();
             return incident;
         
 

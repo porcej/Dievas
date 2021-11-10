@@ -25,6 +25,8 @@ namespace Backend.Hubs {
 
         public DashboardHub(CAD cad){
             _cad = cad;
+            _cad.IncidentAdded += (sender, args) => {Console.WriteLine($"an incident ({args.IncidentId}) was added to the CAD Singleton");};
+            _cad.IncidentChanged += (sender, args) => {Console.WriteLine($"an incident ({args.IncidentId}) was changed in the CAD Singleton");};
         }
 
         // Handle clients connecting
@@ -75,6 +77,13 @@ namespace Backend.Hubs {
             var incident = Incident.FromJson(incidentPayload);
             Console.WriteLine(incident.IncidentType);
             _cad.AddIncident(incident);
+        }
+
+        public async Task SendIncident(string incidentPayload)
+        {
+            var incident = Incident.FromJson(incidentPayload);
+            Console.WriteLine(incident.IncidentType);
+            _cad.AddOrUpdateIncident(incident);
         }
 
         // public async Task JoinCADGroup()
