@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Backend.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,58 +12,56 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using WebEssentials.AspNetCore.OutputCaching;
-using Backend.Hubs;
 
-namespace Backend
-{
-    public class Startup
-    {
+namespace Backend {
 
-        public Startup(IConfiguration configuration)
-        {
+    public class Startup {
+
+        public Startup(IConfiguration configuration) {
             Configuration = configuration;
         }
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddOutputCaching(options =>
-            {
-                options.Profiles["default"] = new OutputCacheProfile
-                {
-                    Duration = 10,
-                    VaryByParam="eventId"
-                };
-            });
+        // This method gets called by the runtime. Use this method to add
+        //      services to the container.
+        public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Backend", Version = "v1" });
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                                        Title = Configuration["AppName"],
+                                        Version = "v1"
+                                    });
             });
             services.AddSignalR();
             services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton<CAD>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
+        // This method gets called by the runtime. Use this method to configure
+        //  the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, 
+                              IWebHostEnvironment env) {
+            
+            string _appDescription = Configuration["AppName"] + 
+                                     " v" + 
+                                     Configuration["Version"];
+
+            if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Backend v1"));
+                app.UseSwaggerUI(c => 
+                    c.SwaggerEndpoint(Configuration["SwaggerEndpoint"],
+                                      _appDescription));
             }
 
             // Split the Origins string by semi-colin to allow multiple origins
-            string[] origins = Configuration["Origins"].Split(";");
+            string[] _origins = Configuration["Origins"].Split(";");
 
             // We setup CORS to allow for our frontend to access this API
             app.UseCors(builder =>
                 builder
-                    .WithOrigins(origins)
+                    .WithOrigins(_origins)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials()
@@ -74,8 +73,7 @@ namespace Backend
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
+            app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
                 endpoints.MapHub<DashboardHub>("/dashboardHub");
             });

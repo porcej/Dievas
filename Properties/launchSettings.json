@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Backend": {
+    "backend": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": true,
