@@ -72,7 +72,7 @@ namespace Backend.Hubs {
         //      * IncidentAdded(incident)
         //          - incident is of class Backend.Models.Incident
 
-        // * The Dashboarc clients accept the following actions sent to the group whos name is
+        // * The Dashboard clients accept the following actions sent to the group whos name is
         //   the string representation of the incident id (incidentId.ToString()) 
         //      * IncidentFieldChanged(incidentId, fieldName, value)
         //          - incidentId is an integer id for the incident (provided upstream)
