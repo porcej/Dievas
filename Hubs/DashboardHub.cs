@@ -9,7 +9,7 @@ namespace Dievas.Hubs {
 
     public interface IDashboardHub {
         Task IncidentAdded(Incident incident);
-        Task IncidentFieldChanged(int incidentId, string field, string value);
+        Task IncidentFieldChanged(int incidentId, string field, Object value);
         Task IncidentUnitStatusChanged(int incidentId, AssignedUnit unit);
         Task IncidentCommentAdded(int incidentId, Comment comment);
         Task UnitStatusChanged(string radioName, int statusId);
@@ -28,14 +28,12 @@ namespace Dievas.Hubs {
         // Handle clients connecting
         public async Task JoinDashboard() {
             await Groups.AddToGroupAsync(Context.ConnectionId, "dashboard");
-            Console.WriteLine("Welcome to dashboard gorup");
         }
 
         // Handle clients disconnecting
         public async Task LeaveDashboard() {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId,
                                               "dashboard");
-            Console.WriteLine("Goodbye from dashboard group");
         }
 
         // Add clients to an incident 
@@ -51,6 +49,7 @@ namespace Dievas.Hubs {
                                               incidentId.ToString());
         }
 
+
         // ***************************************************************************************\
         // ***************************************************************************************/
         // Please have datafeeds run JoinDataFeed() on connection 
@@ -59,14 +58,52 @@ namespace Dievas.Hubs {
         // Handle upstream data sources subscribing to push data
         public async Task JoinDataFeed() {
             await Groups.AddToGroupAsync(Context.ConnectionId, "dataFeed");
-            Console.WriteLine("Welcomes to the data feed *****************");
         }
 
         // Handle upstream data sources disconnecting
         public async Task LeaveDataFeed() {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, "dataFeed");
         }
-        // public async Task JoinCADGroup()
+
+        // ***************************************************************************************\
+        // ***************************************************************************************/
+        // Methods employed by datafeeds to send data out
+
+        // Add new incident
+        public async Task IncidentAdded(Incident incident) {
+            await Clients.Group("dashboard").IncidentAdded(incident);
+            _cad.AddIncident(incident);
+        }
+
+        // Update incident field
+        public async Task IncidentFieldChanged(int incidentId, string field, string value){
+            await Clients.Group("dashboard").IncidentFieldChanged(incidentId, field, value);
+            _cad.UpdateIncidentField(incidentId, field, value);
+        }
+
+        // Change unit status
+        public async Task IncidentUnitStatusChanged(int incidentId, AssignedUnit unit){
+            await Clients.Group("dashboard").IncidentUnitStatusChanged(incidentId, unit);
+            _cad.AddOrUpdateIncidentUnit(incidentId, unit);
+        }
+
+        // Add comment to incidnet
+        public async Task IncidentCommentAdded(int incidentId, Comment comment) {
+            await Clients.Group("dashboard").IncidentCommentAdded(incidentId, comment);
+            _cad.AddOrUpdateIncidentComment(incidentId, comment);
+        }
+
+        // Update unit status for non-incidents
+        public async Task UnitStatusChanged(string radioName, int statusId) {
+            await Clients.Group("dashboard").UnitStatusChanged(radioName, statusId);
+            _cad.UpdateUnitStatus(radioName, statusId);
+        }
+        
+        // Change home station for unit
+        public async Task UnitHomeChanged(string radioName, string homeStation){
+            await Clients.Group("dashboard").UnitHomeChanged(radioName, homeStation);
+            _cad.UpdateUnitField(radioName, "HomeStation", homeStation);
+        }
 
         // ***************************************************************************************\
         // ***************************************************************************************/
