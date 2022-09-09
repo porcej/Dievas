@@ -1,11 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Backend.Models {
     
     public class Incident {
+
+        // Public indexer
+        public object this[string propertyName] {
+            get {
+               Type myType = typeof(Incident);                   
+               PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+               return myPropInfo.GetValue(this, null);
+            }
+            set {
+               Type myType = typeof(Incident);                   
+               PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+               myPropInfo.SetValue(this, value, null);
+            }
+         }
+
         public int id { get; set; }
         public bool active { get; set; }
         public string jurisdiction { get; set; }
