@@ -13,11 +13,14 @@ namespace Backend.Models {
             get {
                 Type myType = typeof(Unit);                   
                 PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                if (myPropInfo is null) return null;
                 return myPropInfo.GetValue(this, null);
             }
             set {
                 Type myType = typeof(Unit);                   
                 PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+
+                if (myPropInfo is null) return;
 
                 // If the provided value is a string, attempt to convert it
                 if (value is string){
@@ -27,6 +30,8 @@ namespace Backend.Models {
                         myPropInfo.SetValue(this, Convert.ToInt32(value), null);
                     if (myPropInfo.PropertyType == typeof(DateTime)) 
                         myPropInfo.SetValue(this, DateTime.Parse(Convert.ToString(value)), null);
+                    if (myPropInfo.PropertyType == typeof(string))
+                        myPropInfo.SetValue(this, value, null);  
                 } else {
                     myPropInfo.SetValue(this, value, null);
                 }
