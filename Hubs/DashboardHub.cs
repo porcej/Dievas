@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Backend.Models;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Backend.Hubs {
+namespace Dievas.Hubs {
 
     public interface IDashboardHub {
         Task IncidentAdded(Incident incident);
@@ -28,12 +28,14 @@ namespace Backend.Hubs {
         // Handle clients connecting
         public async Task JoinDashboard() {
             await Groups.AddToGroupAsync(Context.ConnectionId, "dashboard");
+            Console.WriteLine("Welcome to dashboard gorup");
         }
 
         // Handle clients disconnecting
         public async Task LeaveDashboard() {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId,
                                               "dashboard");
+            Console.WriteLine("Goodbye from dashboard group");
         }
 
         // Add clients to an incident 
@@ -57,6 +59,7 @@ namespace Backend.Hubs {
         // Handle upstream data sources subscribing to push data
         public async Task JoinDataFeed() {
             await Groups.AddToGroupAsync(Context.ConnectionId, "dataFeed");
+            Console.WriteLine("Welcomes to the data feed *****************");
         }
 
         // Handle upstream data sources disconnecting
