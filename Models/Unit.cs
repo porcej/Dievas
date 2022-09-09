@@ -11,14 +11,25 @@ namespace Backend.Models {
         // Public indexer
         public object this[string propertyName] {
             get {
-               Type myType = typeof(Unit);                   
-               PropertyInfo myPropInfo = myType.GetProperty(propertyName);
-               return myPropInfo.GetValue(this, null);
+                Type myType = typeof(Unit);                   
+                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+                return myPropInfo.GetValue(this, null);
             }
             set {
-               Type myType = typeof(Unit);                   
-               PropertyInfo myPropInfo = myType.GetProperty(propertyName);
-               myPropInfo.SetValue(this, value, null);
+                Type myType = typeof(Unit);                   
+                PropertyInfo myPropInfo = myType.GetProperty(propertyName);
+
+                // If the provided value is a string, attempt to convert it
+                if (value is string){
+                    if (myPropInfo.PropertyType == typeof(double)) 
+                        myPropInfo.SetValue(this, Convert.ToDouble(value), null);
+                    if (myPropInfo.PropertyType == typeof(int)) 
+                        myPropInfo.SetValue(this, Convert.ToInt32(value), null);
+                    if (myPropInfo.PropertyType == typeof(DateTime)) 
+                        myPropInfo.SetValue(this, DateTime.Parse(Convert.ToString(value)), null);
+                } else {
+                    myPropInfo.SetValue(this, value, null);
+                }
             }
          }
 
