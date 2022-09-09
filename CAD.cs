@@ -22,13 +22,33 @@ namespace Dievas {
 			return _units.Values.Where(t => t.HomeStation == station).OrderBy( t => t.radioName );
 		}
 
-		public Unit GetUnitByName(string radioName){
+		public Unit GetUnitByName(string radioName) {
 			if (_units.ContainsKey(radioName)) return _units[radioName];
         	return new Unit();
 		}
 
-		public void AddOrUpdateUnit(Unit unit){
+		public void AddOrUpdateUnit(Unit unit) {
 			_units[unit.radioName] = unit;
+		}
+
+		public Unit UpdateUnitField(string radioName, string field, string value) {
+			Unit unit = new Unit {};
+			if (_units.ContainsKey(radioName)) unit = _units[radioName];
+			
+			unit[field] = value;
+			_units[radioName] = unit;		    
+		    
+		    return _units[radioName];
+		}
+
+		public Unit UpdateUnitStatus(string radioName, int statusId) {
+			Unit unit = new Unit {};
+			if (_units.ContainsKey(radioName)) unit = _units[radioName];
+			
+			unit.statusId = statusId;
+			_units[radioName] = unit;		    
+		    
+		    return _units[radioName];
 		}
 
 		public IEnumerable GetIncidents() {
@@ -66,69 +86,7 @@ namespace Dievas {
 			Incident incident = new Incident {};
 
 			if (_incidents.ContainsKey(id)) incident = _incidents[id];
-
-		    switch (field) {
-		        case "active":
-		            incident.active = (value.ToLower() == "true");
-		            break;
-		        case "jurisdiction":
-		            incident.jurisdiction = value;
-		            break;
-		        case "incidentType":
-		            incident.incidentType = value;
-		            break; 
-		        case "LocationName":
-		            incident.LocationName = value;
-		            break; 
-		        case "address":
-		            incident.address = value;
-		            break; 
-		        case "apartment":
-		            incident.apartment = value;
-		            break; 
-		        case "city":
-		            incident.city = value;
-		            break; 
-		        case "state":
-		            incident.state = value;
-		            break; 
-		        case "postalCode":
-		            incident.postalCode = value;
-		            break; 
-		        case "county":
-		            incident.county = value;
-		            break; 
-		        case "locationType":
-		            incident.locationType = value;
-		            break; 
-		        case "crossStreet":
-		            incident.crossStreet = value;
-		            break; 
-		        case "commandChannel":
-		            incident.commandChannel = value;
-		            break; 
-		        case "primaryTACChannel":
-		            incident.primaryTACChannel = value;
-		            break; 
-		        case "alternateTACChannel":
-		            incident.alternateTACChannel = value;
-		            break; 
-		        case "callDisposition":
-		            incident.callDisposition = value;
-		            break;
-		        case "longitude":
-		            incident.longitude = Convert.ToDouble(value);
-		            break;
-		        case "latitude":
-		            incident.latitude = Convert.ToDouble(value);
-		            break;
-		        case "incidentStartTime":
-		            incident.incidentStartTime = DateTime.Parse(value);
-		            break;
-		        case "incidentEndTime":
-		            incident.incidentEndTime = DateTime.Parse(value);
-		            break;
-		    }
+			incident[field] = value;
 			_incidents[id] = incident;		    
 		    return _incidents[id];
 		}
