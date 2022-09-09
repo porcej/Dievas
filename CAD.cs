@@ -134,6 +134,13 @@ namespace Dievas {
 		}
 
 		public Incident AddOrUpdateIncidentUnit(int id, AssignedUnit unit) {
+
+			// Update global unit
+			Unit globalUnit = GetUnitByName(unit.radioName);
+			globalUnit.statusId = unit.statusId;
+			AddOrUpdateUnit(globalUnit);
+
+			// Update unit on incident
 			Incident incident = new Incident {};
 
 			if (_incidents.ContainsKey(id)) incident = _incidents[id];
@@ -144,6 +151,33 @@ namespace Dievas {
                 incident.Units.Add(unit);
             } else {
                 incident.Units[unitKey] = unit;
+            }
+            _incidents[id] = incident;
+            return incident;
+		}
+
+		public Incident AddOrUpdateIncidentUnit(int id, Unit unit) {
+
+			// Update global unit
+			AddOrUpdateUnit(unit);
+
+			AssignedUnit assignedUnit = new AssignedUnit {};
+
+			assignedUnit.radioName = unit.radioName;
+			assignedUnit.statusId = unit.statusId;
+
+
+			// Update unit on incident
+			Incident incident = new Incident {};
+
+			if (_incidents.ContainsKey(id)) incident = _incidents[id];
+
+            var unitKey = incident.Units.IndexOf(assignedUnit);
+            
+            if (unitKey < 0) {
+                incident.Units.Add(assignedUnit);
+            } else {
+                incident.Units[unitKey] = assignedUnit;
             }
             _incidents[id] = incident;
             return incident;
