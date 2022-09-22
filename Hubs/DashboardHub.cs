@@ -14,6 +14,7 @@ namespace Dievas.Hubs {
         Task IncidentCommentAdded(int incidentId, Comment comment);
         Task UnitStatusChanged(string radioName, int statusId);
         Task UnitHomeChanged(string radioName, string homeStation);
+        Task GetAllIncidents(int minutesPast);
     }
 
     //  Here we handle general client communications
@@ -58,6 +59,7 @@ namespace Dievas.Hubs {
         // Handle upstream data sources subscribing to push data
         public async Task JoinDataFeed() {
             await Groups.AddToGroupAsync(Context.ConnectionId, "dataFeed");
+            await GetAllIncidents(4320);
         }
 
         // Handle upstream data sources disconnecting
@@ -68,6 +70,16 @@ namespace Dievas.Hubs {
         // ***************************************************************************************\
         // ***************************************************************************************/
         // Methods employed by datafeeds to send data out
+
+        // Receive all incidents on initialization
+        public async Task AllIncidents(IEnumerable<Incident> incidents)
+        {
+            foreach (var incident in incidents)
+            {
+                _cad.AddIncident(incident);
+                await Clients.Group("dashboard").IncidentAdded(incident);
+            }
+        }
 
         // Add new incident
         public async Task IncidentAdded(Incident incident) {
@@ -143,6 +155,11 @@ namespace Dievas.Hubs {
 
             _cad.UpdateIncidentField(incidentId, "incidentType", newIncidentType);
 
+        }
+
+        public async Task GetAllIncidents(int minutesPast)
+        {
+            await Clients.Group("dataFeed").GetAllIncidents(minutesPast);
         }
     }
 }
