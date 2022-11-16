@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
 using Microsoft.AspNetCore.SignalR;
+using AFD.Dashboard.Models;
 
 namespace Dievas.Hubs {
 

@@ -1,0 +1,3 @@
+[submodule "Dashboard.Models"]
+	path = Dashboard.Models
+	url = https://github.com/timbellomo/Dashboard.Models.git
