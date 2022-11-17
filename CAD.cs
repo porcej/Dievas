@@ -20,7 +20,7 @@ namespace Dievas {
 		}
 
 		public IEnumerable GetUnitsByStation(string station) {
-			return _units.Values.Where(t => t.HomeStation == station).OrderBy( t => t.radioName );
+			return _units.Values.Where(t => t.HomeStation == station).OrderBy( t => t.RadioName );
 		}
 
 		public UnitDto GetUnitByName(string radioName) {
@@ -28,8 +28,10 @@ namespace Dievas {
         	return new UnitDto();
 		}
 
-		public void AddOrUpdateUnit(UnitDto unit) {
+		public void AddOrUpdateUnit(UnitDto unit)
+		{
 			_units[unit.RadioName] = unit;
+
 		}
 
 		public UnitDto UpdateUnitField(string radioName, string field, string value) {
@@ -161,5 +163,15 @@ namespace Dievas {
 		public int IncidentCount() {
 			return _incidents.Count;
 		}
+
+		public int PopulateUnitList(IEnumerable<UnitDto> initialUnits)
+		{
+			foreach (var unit in initialUnits)
+			{
+				_units[unit.RadioName] = unit;
+			}
+			return initialUnits.Count();
+		}
+		
 	}
 }

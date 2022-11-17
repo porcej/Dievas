@@ -61,7 +61,7 @@ namespace Dievas.Hubs {
         // Handle upstream data sources subscribing to push data
         public async Task JoinDataFeed() {
             await Groups.AddToGroupAsync(Context.ConnectionId, "dataFeed");
-            //await GetAllIncidents(4320);
+            await GetAllIncidents(4320);
             await Clients.Group("dataFeed").GetAllUnits();
         }
 
@@ -82,6 +82,12 @@ namespace Dievas.Hubs {
                 _cad.AddIncident(incident);
                 await Clients.Group("dashboard").IncidentAdded(incident);
             }
+        }
+
+        //Receive all units on initialization
+        public async Task AllUnits(IEnumerable<UnitDto> units)
+        {
+            _cad.PopulateUnitList(units);
         }
 
         // Add new incident
