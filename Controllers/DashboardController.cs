@@ -54,6 +54,12 @@ namespace Dievas.Controllers {
             return new JsonResult(_cad.GetIncident(id));
         }
 
+        [HttpGet("units")]
+        public IEnumerable GetUnits()
+        {
+            return _cad.GetUnits();
+        }
+
         // Web API for data feeds to add incident information
 
         // Add (or updates) new incident
