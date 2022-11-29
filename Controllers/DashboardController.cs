@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using AFD.Dashboard.Models;
 
 namespace Dievas.Controllers {
 
@@ -53,12 +54,18 @@ namespace Dievas.Controllers {
             return new JsonResult(_cad.GetIncident(id));
         }
 
+        [HttpGet("units")]
+        public IEnumerable GetUnits()
+        {
+            return _cad.GetUnits();
+        }
+
         // Web API for data feeds to add incident information
 
         // Add (or updates) new incident
         [HttpPost("feed/incident")]
         [Authorize]
-        public async Task<Incident> AddIncident(Incident incident) {
+        public async Task<IncidentDto> AddIncident(IncidentDto incident) {
             await this._hubContext.Clients.Group("dashboard").IncidentAdded(incident);
             return _cad.AddIncident(incident);
         }
@@ -66,7 +73,7 @@ namespace Dievas.Controllers {
         // Add existing incident by id
         [HttpPost("feed/incident/{id}")]
         [Authorize]
-        public async Task<Incident> AddIncidentById(int id, Incident incident) {
+        public async Task<IncidentDto> AddIncidentById(int id, IncidentDto incident) {
             await this._hubContext.Clients.Group("dashboard").IncidentAdded(incident);
             return _cad.AddIncident(id, incident);
         }
@@ -74,7 +81,7 @@ namespace Dievas.Controllers {
         // // Update existing incident
         [HttpPost("feed/incident/{id}/update")]
         [Authorize]
-        public async Task<Incident> UpdateIncident(int id, string field, string value) {
+        public async Task<IncidentDto> UpdateIncident(int id, string field, string value) {
             await this._hubContext
                       .Clients
                       .Group(id.ToString())
@@ -85,7 +92,7 @@ namespace Dievas.Controllers {
         // Add or update unit on incident
         [HttpPost("feed/incident/{id}/unit")]
         [Authorize]
-        public async Task<Incident> UpdateIncidentUnits(int id, AssignedUnit unit) {
+        public async Task<IncidentDto> UpdateIncidentUnits(int id, UnitAssignmentDto unit) {
             await this._hubContext
                         .Clients
                         .Group(id.ToString())
@@ -96,7 +103,7 @@ namespace Dievas.Controllers {
 
         [HttpPost("feed/incident/{id}/comment")]
         [Authorize]
-        public async Task<Incident> AddIncidentComment(int id, Comment comment) {
+        public async Task<IncidentDto> AddIncidentComment(int id, CommentDto comment) {
             await this._hubContext
                         .Clients
                         .Group(id.ToString())
@@ -106,40 +113,40 @@ namespace Dievas.Controllers {
         }
 
         // TEST FUNCTIONS PLEASE REMOVE
-        [HttpGet("test")]
-        public async Task<Incident> GenerateTestIncident() {
-            var _nextCount = _cad.IncidentCount() + 1;
-            var _incident = new Incident {
-                id = _nextCount,
-                active = true,
-                jurisdiction = "200 ALX",
-                incidentType = "FIRE-LOCAL ALARM",
-                LocationName = "ALEXANDRIA FIRE STATION 204",
-                address = _nextCount.ToString(),
-                apartment = "",
-                city = "CITY OF ALEXANDRIA",
-                state = "VA",
-                postalCode = "22314",
-                county = "Alexandria",
-                locationType = "Government or Public Building",
-                longitude = -77.0467847,
-                latitude = 38.8163701,
-                crossStreet = "POWHATAN ST",
-                commandChannel = "",
-                primaryTACChannel = "2 BRAVO",
-                alternateTACChannel = "",
-                callDisposition = "",
-                incidentStartTime = DateTime.Now,
-                // incidentEndTime = "",
-                Comments = new List<Comment>{ new Comment { id = 0, commentText = "incident notes here"}},
-                Units = new List<AssignedUnit>{ new AssignedUnit { radioName = "E204", statusId = 1 } }
-            };
+        //[HttpGet("test")]
+        //public async Task<IncidentDto> GenerateTestIncident() {
+        //    var _nextCount = _cad.IncidentCount() + 1;
+        //    var _incident = new IncidentDto {
+        //        Id = _nextCount,
+        //        active = true,
+        //        jurisdiction = "200 ALX",
+        //        incidentType = "FIRE-LOCAL ALARM",
+        //        LocationName = "ALEXANDRIA FIRE STATION 204",
+        //        address = _nextCount.ToString(),
+        //        apartment = "",
+        //        city = "CITY OF ALEXANDRIA",
+        //        state = "VA",
+        //        postalCode = "22314",
+        //        county = "Alexandria",
+        //        locationType = "Government or Public Building",
+        //        longitude = -77.0467847,
+        //        latitude = 38.8163701,
+        //        crossStreet = "POWHATAN ST",
+        //        commandChannel = "",
+        //        primaryTACChannel = "2 BRAVO",
+        //        alternateTACChannel = "",
+        //        callDisposition = "",
+        //        incidentStartTime = DateTime.Now,
+        //        // incidentEndTime = "",
+        //        Comments = new List<CommentDto>{ new CommentDto { id = 0, commentText = "incident notes here"}},
+        //        UnitsAssigned = new List<UnitAssignmentDto>{ new UnitAssignmentDto { radioName = "E204", statusId = 1 } }
+        //    };
 
-            return await this.AddIncidentById(_nextCount, _incident);
-        }
+        //    return await this.AddIncidentById(_nextCount, _incident);
+        //}
 
         [HttpGet("testUpdate")]
-        public async Task<Incident> GenerateTestUpdate() {
+        public async Task<IncidentDto> GenerateTestUpdate() {
             var _incidentId = 1;
             var _field = "incidentType";
             var _value = "* UPDATED * ";
@@ -147,23 +154,23 @@ namespace Dievas.Controllers {
         }
 
         [HttpGet("testUpdate/{id}")]
-        public async Task<Incident> GenerateTestUpdate(int id) {
+        public async Task<IncidentDto> GenerateTestUpdate(int id) {
             var _field = "incidentType";
             var _value = "* UPDATED * ";
             return await this.UpdateIncident(id, _field, _value);
         }
 
         [HttpGet("testUnit")]
-        public async Task<Incident> GenerateTestUnit() {
+        public async Task<IncidentDto> GenerateTestUnit() {
             var _id = 1;
-            var _unit = new AssignedUnit { radioName = "*200*", statusId = 1 };
+            var _unit = new UnitAssignmentDto { RadioName = "*200*", StatusId = 1 };
             return await this.UpdateIncidentUnits(_id, _unit);
         }
 
         [HttpGet("testUnitUpdate/{unit}")]
-        public async Task<Incident> GenerateTestUnitUpdate(string unit) {
+        public async Task<IncidentDto> GenerateTestUnitUpdate(string unit) {
             var _id = 1;
-            var _unit = new AssignedUnit { radioName = unit, statusId = 5 };
+            var _unit = new UnitAssignmentDto { RadioName = unit, StatusId = 5 };
             return await this.UpdateIncidentUnits(_id, _unit);
         }
 

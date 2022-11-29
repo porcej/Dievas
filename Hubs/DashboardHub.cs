@@ -4,17 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
 using Microsoft.AspNetCore.SignalR;
+using AFD.Dashboard.Models;
 
 namespace Dievas.Hubs {
 
     public interface IDashboardHub {
-        Task IncidentAdded(Incident incident);
+        Task IncidentAdded(IncidentDto incident);
         Task IncidentFieldChanged(int incidentId, string field, Object value);
-        Task IncidentUnitStatusChanged(int incidentId, AssignedUnit unit);
-        Task IncidentCommentAdded(int incidentId, Comment comment);
+        Task IncidentUnitStatusChanged(int incidentId, UnitAssignmentDto unit);
+        Task IncidentCommentAdded(int incidentId, CommentDto comment);
         Task UnitStatusChanged(string radioName, int statusId);
         Task UnitHomeChanged(string radioName, string homeStation);
         Task GetAllIncidents(int minutesPast);
+        Task GetAllUnits();
     }
 
     //  Here we handle general client communications
@@ -60,6 +62,7 @@ namespace Dievas.Hubs {
         public async Task JoinDataFeed() {
             await Groups.AddToGroupAsync(Context.ConnectionId, "dataFeed");
             await GetAllIncidents(4320);
+            await Clients.Group("dataFeed").GetAllUnits();
         }
 
         // Handle upstream data sources disconnecting
@@ -72,7 +75,7 @@ namespace Dievas.Hubs {
         // Methods employed by datafeeds to send data out
 
         // Receive all incidents on initialization
-        public async Task AllIncidents(IEnumerable<Incident> incidents)
+        public async Task AllIncidents(IEnumerable<IncidentDto> incidents)
         {
             foreach (var incident in incidents)
             {
@@ -81,8 +84,14 @@ namespace Dievas.Hubs {
             }
         }
 
+        //Receive all units on initialization
+        public async Task AllUnits(IEnumerable<UnitDto> units)
+        {
+            _cad.PopulateUnitList(units);
+        }
+
         // Add new incident
-        public async Task IncidentAdded(Incident incident) {
+        public async Task IncidentAdded(IncidentDto incident) {
             await Clients.Group("dashboard").IncidentAdded(incident);
             _cad.AddIncident(incident);
         }
@@ -94,13 +103,13 @@ namespace Dievas.Hubs {
         }
 
         // Change unit status
-        public async Task IncidentUnitStatusChanged(int incidentId, AssignedUnit unit){
+        public async Task IncidentUnitStatusChanged(int incidentId, UnitAssignmentDto unit){
             await Clients.Group("dashboard").IncidentUnitStatusChanged(incidentId, unit);
             _cad.AddOrUpdateIncidentUnit(incidentId, unit);
         }
 
         // Add comment to incidnet
-        public async Task IncidentCommentAdded(int incidentId, Comment comment) {
+        public async Task IncidentCommentAdded(int incidentId, CommentDto comment) {
             await Clients.Group("dashboard").IncidentCommentAdded(incidentId, comment);
             _cad.AddOrUpdateIncidentComment(incidentId, comment);
         }
@@ -141,9 +150,10 @@ namespace Dievas.Hubs {
         // The following are example hooks
 
         public async Task AddNewIncidentWithOneUnitInTheDispatchedStatus(int incidentId, string radioName){
-            Incident incident = new Incident {
-                id = incidentId,
-                Units = new List<AssignedUnit>{ new AssignedUnit { radioName = radioName, statusId = 1 } }
+            IncidentDto incident = new IncidentDto
+            {
+                Id = incidentId,
+                UnitsAssigned = new List<UnitAssignmentDto>{ new UnitAssignmentDto { RadioName = radioName, StatusId = 1 } }
             };
 
             await Clients.Group("dashboard").IncidentAdded(incident);

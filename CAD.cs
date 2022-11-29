@@ -5,34 +5,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
+using AFD.Dashboard.Models;
 
 namespace Dievas {
 	
 	public class CAD {
 
-		private readonly ConcurrentDictionary<int, Incident> _incidents = new ConcurrentDictionary<int, Incident>();
+		private readonly ConcurrentDictionary<int, IncidentDto> _incidents = new ConcurrentDictionary<int, IncidentDto>();
 
-		private readonly ConcurrentDictionary<string, Unit> _units = new ConcurrentDictionary<string, Unit>();
+		private readonly ConcurrentDictionary<string, UnitDto> _units = new ConcurrentDictionary<string, UnitDto>();
 
 		public IEnumerable GetUnits() {
-			return _units.Values.OrderBy( t => t.radioName );
+			return _units.Values.OrderBy( t => t.RadioName );
 		}
 
 		public IEnumerable GetUnitsByStation(string station) {
-			return _units.Values.Where(t => t.HomeStation == station).OrderBy( t => t.radioName );
+			return _units.Values.Where(t => t.HomeStation == station).OrderBy( t => t.RadioName );
 		}
 
-		public Unit GetUnitByName(string radioName) {
+		public UnitDto GetUnitByName(string radioName) {
 			if (_units.ContainsKey(radioName)) return _units[radioName];
-        	return new Unit();
+        	return new UnitDto();
 		}
 
-		public void AddOrUpdateUnit(Unit unit) {
-			_units[unit.radioName] = unit;
+		public void AddOrUpdateUnit(UnitDto unit)
+		{
+			_units[unit.RadioName] = unit;
+
 		}
 
-		public Unit UpdateUnitField(string radioName, string field, string value) {
-			Unit unit = new Unit {};
+		public UnitDto UpdateUnitField(string radioName, string field, string value) {
+			UnitDto unit = new UnitDto{};
 			if (_units.ContainsKey(radioName)) unit = _units[radioName];
 			
 			unit[field] = value;
@@ -41,49 +44,49 @@ namespace Dievas {
 		    return _units[radioName];
 		}
 
-		public Unit UpdateUnitStatus(string radioName, int statusId) {
-			Unit unit = new Unit {};
+		public UnitDto UpdateUnitStatus(string radioName, int statusId) {
+			UnitDto unit = new UnitDto {};
 			if (_units.ContainsKey(radioName)) unit = _units[radioName];
 			
-			unit.statusId = statusId;
+			unit.StatusId = statusId;
 			_units[radioName] = unit;		    
 		    
 		    return _units[radioName];
 		}
 
 		public IEnumerable GetIncidents() {
-            return _incidents.Values.OrderBy( t => t.id );
+            return _incidents.Values.OrderBy( t => t.Id );
         }
 
         public IEnumerable GetActiveIncidents() {
-            return _incidents.Values.Where(t => t.active).OrderBy( t => t.id );
+            return _incidents.Values.Where(t => t.IsActive).OrderBy( t => t.Id );
         }
 
-        public Incident GetIncident(int id) {
+        public IncidentDto GetIncident(int id) {
         	if (_incidents.ContainsKey(id)) return _incidents[id];
-        	return new Incident();
+        	return new IncidentDto();
         }
 
 		// We don't do incident # checking here, for the case where we want to add
 		// an existing incident with new and or updated data
-		public Incident AddIncident(int id, Incident incident){
+		public IncidentDto AddIncident(int id, IncidentDto incident){
 			_incidents[id] = incident;
 			return incident;
 		}
 
 		// We don't do incident # checking here, for the case where we want to add
 		// an existing incident with new and or updated data
-		public Incident AddIncident(Incident incident){
-			int id = incident.id;
+		public IncidentDto AddIncident(IncidentDto incident){
+			int id = incident.Id;
 			_incidents[id] = incident;
 			return incident;
 		}
 
 		// Update incident Field - any updates, we copy out the value, make the update
 		// return the value to the dict
-		public Incident UpdateIncidentField(int id, string field, string value){
+		public IncidentDto UpdateIncidentField(int id, string field, string value){
 
-			Incident incident = new Incident {};
+			IncidentDto incident = new IncidentDto {};
 
 			if (_incidents.ContainsKey(id)) incident = _incidents[id];
 			incident[field] = value;
@@ -91,58 +94,58 @@ namespace Dievas {
 		    return _incidents[id];
 		}
 
-		public Incident AddOrUpdateIncidentUnit(int id, AssignedUnit unit) {
+		public IncidentDto AddOrUpdateIncidentUnit(int id, UnitAssignmentDto unit) {
 
 			// Update global unit
-			Unit globalUnit = GetUnitByName(unit.radioName);
-			globalUnit.statusId = unit.statusId;
+			UnitDto globalUnit = GetUnitByName(unit.RadioName);
+			globalUnit.StatusId = unit.StatusId;
 			AddOrUpdateUnit(globalUnit);
 
 			// Update unit on incident
-			Incident incident = new Incident {};
+			IncidentDto incident = new IncidentDto {};
 
 			if (_incidents.ContainsKey(id)) incident = _incidents[id];
 
-            var unitKey = incident.Units.IndexOf(unit);
+            var unitKey = incident.UnitsAssigned.IndexOf(unit);
             
             if (unitKey < 0) {
-                incident.Units.Add(unit);
+                incident.UnitsAssigned.Add(unit);
             } else {
-                incident.Units[unitKey] = unit;
+                incident.UnitsAssigned[unitKey] = unit;
             }
             _incidents[id] = incident;
             return incident;
 		}
 
-		public Incident AddOrUpdateIncidentUnit(int id, Unit unit) {
+		public IncidentDto AddOrUpdateIncidentUnit(int id, UnitDto unit) {
 
 			// Update global unit
 			AddOrUpdateUnit(unit);
 
-			AssignedUnit assignedUnit = new AssignedUnit {};
+			UnitAssignmentDto assignedUnit = new UnitAssignmentDto { };
 
-			assignedUnit.radioName = unit.radioName;
-			assignedUnit.statusId = unit.statusId;
+			assignedUnit.RadioName = unit.RadioName;
+			assignedUnit.StatusId = unit.StatusId;
 
 
 			// Update unit on incident
-			Incident incident = new Incident {};
+			IncidentDto incident = new IncidentDto {};
 
 			if (_incidents.ContainsKey(id)) incident = _incidents[id];
 
-            var unitKey = incident.Units.IndexOf(assignedUnit);
+            var unitKey = incident.UnitsAssigned.IndexOf(assignedUnit);
             
             if (unitKey < 0) {
-                incident.Units.Add(assignedUnit);
+                incident.UnitsAssigned.Add(assignedUnit);
             } else {
-                incident.Units[unitKey] = assignedUnit;
+                incident.UnitsAssigned[unitKey] = assignedUnit;
             }
             _incidents[id] = incident;
             return incident;
 		}
 
-		public Incident AddOrUpdateIncidentComment(int id, Comment comment){
-			Incident incident = new Incident {};
+		public IncidentDto AddOrUpdateIncidentComment(int id, CommentDto comment){
+			IncidentDto incident = new IncidentDto {};
 
 			if (_incidents.ContainsKey(id)) incident = _incidents[id];
 
@@ -160,5 +163,15 @@ namespace Dievas {
 		public int IncidentCount() {
 			return _incidents.Count;
 		}
+
+		public int PopulateUnitList(IEnumerable<UnitDto> initialUnits)
+		{
+			foreach (var unit in initialUnits)
+			{
+				_units[unit.RadioName] = unit;
+			}
+			return initialUnits.Count();
+		}
+		
 	}
 }
