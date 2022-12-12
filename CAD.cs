@@ -156,11 +156,8 @@ namespace Dievas {
 
 			if (_incidents.TryGetValue(id, out incident))
 			{
-				if (incident.Comments == null)
-				{
-					incident.Comments = new List<CommentDto>();
-				}
-
+				incident.Comments ??= new List<CommentDto>();
+				
 				var commentKey = incident.Comments.IndexOf(comment);
 
 				if (commentKey < 0) {
