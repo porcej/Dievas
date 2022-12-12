@@ -122,26 +122,33 @@ namespace Dievas {
 			// Update global unit
 			AddOrUpdateUnit(unit);
 
-			UnitAssignmentDto assignedUnit = new UnitAssignmentDto { };
-
-			assignedUnit.RadioName = unit.RadioName;
-			assignedUnit.StatusId = unit.StatusId;
-
+			UnitAssignmentDto assignedUnit = new UnitAssignmentDto { 
+				RadioName = unit.RadioName,
+				StatusId = unit.StatusId,
+				IncidentId = id
+			};
 
 			// Update unit on incident
-			IncidentDto incident = new IncidentDto {};
+			IncidentDto incident;
 
-			if (_incidents.ContainsKey(id)) incident = _incidents[id];
+			if (_incidents.TryGetValue(id, out incident))
+			{
+				incident.UnitsAssigned ??= new List<UnitAssignmentDto>();
 
-            var unitKey = incident.UnitsAssigned.IndexOf(assignedUnit);
-            
-            if (unitKey < 0) {
-                incident.UnitsAssigned.Add(assignedUnit);
-            } else {
-                incident.UnitsAssigned[unitKey] = assignedUnit;
-            }
-            _incidents[id] = incident;
-            return incident;
+				var unitKey = incident.UnitsAssigned.IndexOf(assignedUnit);
+
+				if (unitKey < 0)
+				{
+					incident.UnitsAssigned.Add(assignedUnit);
+				}
+				else
+				{
+					incident.UnitsAssigned[unitKey] = assignedUnit;
+				}
+				_incidents[id] = incident;
+				return incident;
+			}
+			return null;
 		}
 
 		public IncidentDto AddOrUpdateIncidentComment(int id, CommentDto comment){
