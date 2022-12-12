@@ -86,12 +86,15 @@ namespace Dievas {
 		// return the value to the dict
 		public IncidentDto UpdateIncidentField(int id, string field, string value){
 
-			IncidentDto incident = new IncidentDto {};
+            IncidentDto incident;
 
-			if (_incidents.ContainsKey(id)) incident = _incidents[id];
-			incident[field] = value;
-			_incidents[id] = incident;		    
-		    return _incidents[id];
+			if (_incidents.TryGetValue(id, out incident))
+			{
+				incident[field] = value;
+				_incidents[id] = incident;
+				return _incidents[id];
+			}
+			return null;
 		}
 
 		public IncidentDto AddOrUpdateIncidentUnit(int id, UnitAssignmentDto unit) {
