@@ -108,6 +108,7 @@ namespace Dievas {
 			// Update global unit
 			UnitDto globalUnit = GetUnitByName(unit.RadioName);
 			globalUnit.StatusId = unit.StatusId;
+			globalUnit.IncidentId = unit.IncidentId;
 			AddOrUpdateUnit(globalUnit);
 
             // Update unit on incident
