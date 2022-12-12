@@ -35,23 +35,29 @@ namespace Dievas {
 		}
 
 		public UnitDto UpdateUnitField(string radioName, string field, string value) {
-			UnitDto unit = new UnitDto{};
-			if (_units.ContainsKey(radioName)) unit = _units[radioName];
-			
-			unit[field] = value;
-			_units[radioName] = unit;		    
-		    
-		    return _units[radioName];
+            UnitDto unit;
+
+			if (_units.TryGetValue(radioName, out unit))
+			{
+				unit[field] = value;
+				_units[radioName] = unit;
+
+				return _units[radioName];
+			}
+			return null;
 		}
 
 		public UnitDto UpdateUnitStatus(string radioName, int statusId) {
-			UnitDto unit = new UnitDto {};
-			if (_units.ContainsKey(radioName)) unit = _units[radioName];
-			
-			unit.StatusId = statusId;
-			_units[radioName] = unit;		    
+			UnitDto unit;
+
+			if (_units.TryGetValue(radioName,out unit))
+			{
+				unit.StatusId = statusId;
+				_units[radioName] = unit;		    
 		    
-		    return _units[radioName];
+				return _units[radioName];
+			}
+			return null;	
 		}
 
 		public IEnumerable GetIncidents() {
