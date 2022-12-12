@@ -145,19 +145,26 @@ namespace Dievas {
 		}
 
 		public IncidentDto AddOrUpdateIncidentComment(int id, CommentDto comment){
-			IncidentDto incident = new IncidentDto {};
+			IncidentDto incident;
 
-			if (_incidents.ContainsKey(id)) incident = _incidents[id];
+			if (_incidents.TryGetValue(id, out incident))
+			{
+				if (incident.Comments == null)
+				{
+					incident.Comments = new List<CommentDto>();
+				}
 
-			var commentKey = incident.Comments.IndexOf(comment);
+				var commentKey = incident.Comments.IndexOf(comment);
 
-            if (commentKey < 0) {
-                incident.Comments.Add(comment);
-            } else {
-                incident.Comments[commentKey] = comment;
-            }
-            _incidents[id] = incident;
-            return incident;
+				if (commentKey < 0) {
+					incident.Comments.Add(comment);
+				} else {
+					incident.Comments[commentKey] = comment;
+				}
+				_incidents[id] = incident;
+				return incident;
+			}
+			return null;
 		}
 
 		public int IncidentCount() {
