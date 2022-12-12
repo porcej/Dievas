@@ -17,6 +17,7 @@ namespace Dievas.Hubs {
         Task UnitHomeChanged(string radioName, string homeStation);
         Task GetAllIncidents(int minutesPast);
         Task GetAllUnits();
+        Task GetIncident(int incidentId);
     }
 
     //  Here we handle general client communications
@@ -99,19 +100,25 @@ namespace Dievas.Hubs {
         // Update incident field
         public async Task IncidentFieldChanged(int incidentId, string field, string value){
             await Clients.Group("dashboard").IncidentFieldChanged(incidentId, field, value);
-            _cad.UpdateIncidentField(incidentId, field, value);
+            var result = _cad.UpdateIncidentField(incidentId, field, value);
+            if (result == null) 
+                await GetIncident(incidentId);
         }
 
         // Change unit status
         public async Task IncidentUnitStatusChanged(int incidentId, UnitAssignmentDto unit){
             await Clients.Group("dashboard").IncidentUnitStatusChanged(incidentId, unit);
-            _cad.AddOrUpdateIncidentUnit(incidentId, unit);
+            var result = _cad.AddOrUpdateIncidentUnit(incidentId, unit);
+            if (result == null)
+                await GetIncident(incidentId);
         }
 
         // Add comment to incidnet
         public async Task IncidentCommentAdded(int incidentId, CommentDto comment) {
             await Clients.Group("dashboard").IncidentCommentAdded(incidentId, comment);
-            _cad.AddOrUpdateIncidentComment(incidentId, comment);
+            var result = _cad.AddOrUpdateIncidentComment(incidentId, comment);
+            if (result == null)
+                await GetIncident(incidentId);
         }
 
         // Update unit status for non-incidents
@@ -170,6 +177,11 @@ namespace Dievas.Hubs {
         public async Task GetAllIncidents(int minutesPast)
         {
             await Clients.Group("dataFeed").GetAllIncidents(minutesPast);
+        }
+
+        public async Task GetIncident(int incidentId)
+        {
+            await Clients.Group("dataFeed").GetIncident(incidentId);
         }
     }
 }
