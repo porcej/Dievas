@@ -123,7 +123,7 @@ namespace Dievas.Hubs {
         // Change home station for unit
         public async Task UnitHomeChanged(string radioName, string homeStation){
             await Clients.Group("dashboard").UnitHomeChanged(radioName, homeStation);
-            _cad.UpdateUnitField(radioName, "HomeStation", homeStation);
+            _cad.UpdateUnitField(radioName, "CurrentStation", homeStation);
         }
 
         // ***************************************************************************************\
