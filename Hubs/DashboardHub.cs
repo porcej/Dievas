@@ -14,7 +14,7 @@ namespace Dievas.Hubs {
         Task IncidentUnitStatusChanged(int incidentId, UnitAssignmentDto unit);
         Task IncidentCommentAdded(int incidentId, CommentDto comment);
         Task UnitStatusChanged(string radioName, int statusId);
-        Task UnitHomeChanged(string radioName, string homeStation);
+        Task UnitFieldChanged(string radioName, string field, Object value);
         Task GetAllIncidents(int minutesPast);
         Task GetAllUnits();
     }
@@ -119,11 +119,11 @@ namespace Dievas.Hubs {
             await Clients.Group("dashboard").UnitStatusChanged(radioName, statusId);
             _cad.UpdateUnitStatus(radioName, statusId);
         }
-        
-        // Change home station for unit
-        public async Task UnitHomeChanged(string radioName, string homeStation){
-            await Clients.Group("dashboard").UnitHomeChanged(radioName, homeStation);
-            _cad.UpdateUnitField(radioName, "HomeStation", homeStation);
+
+        public async Task UnitFieldChanged(string radioName, string field, string value)
+        {
+            await Clients.Group("dashboard").UnitFieldChanged(radioName, field, value);
+            _cad.UpdateUnitField(radioName, field, value);
         }
 
         // ***************************************************************************************\
