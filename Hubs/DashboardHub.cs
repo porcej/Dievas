@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
 using AFD.Dashboard.Models;
 
 namespace Dievas.Hubs {
@@ -24,7 +25,10 @@ namespace Dievas.Hubs {
         
         private static CAD _cad;
 
-        public DashboardHub(CAD cad){
+        private readonly IConfiguration _config;
+
+        public DashboardHub(IConfiguration configuration, CAD cad){
+            _config = configuration;
             _cad = cad;
         }
 
@@ -94,6 +98,9 @@ namespace Dievas.Hubs {
         public async Task IncidentAdded(IncidentDto incident) {
             await Clients.Group("dashboard").IncidentAdded(incident);
             _cad.AddIncident(incident);
+            double hoursToKeep = 0;
+            Double.TryParse(_config["Hub:HoursToKeepIncidents"], out hoursToKeep);
+            _cad.RemoveClosedIncidents(hoursToKeep);
         }
 
         // Update incident field
