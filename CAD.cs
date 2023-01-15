@@ -195,6 +195,28 @@ namespace Dievas {
 			return count;
 		}
 
+		/// Remove's all closed incidents older than now - ABS(hours), hours old
+		/// If hours is zero, removes all closed incidents
+		public int RemoveClosedIncidents(double hours = 0) {
+			if (hours > 0) hours = hours * -1;
+
+			DateTime timeThreshold = DateTime.Now.AddHours(hours);
+
+			var oldIncidents = _incidents.Where(i =>
+				timeThreshold >= i.Value.IncidentEndDateTime
+				// timeThreshold.GreaterThanOrEqual<DateTime>(i.Value.IncidentEndDateTime)
+			).ToArray();
+
+			/// TODO: ADD Logging for count
+			/// _logger.log(LogLevel.Debug, "{} incidents older than {} slated for removal.", oldIncidents.length, timeThreshold);
+
+			int count = 0;
+			foreach (var oldIncident in oldIncidents) {
+				if (this._removeIncident(oldIncident)) count++;
+			}
+
+			return count;
+		}
 		private bool _removeIncident(KeyValuePair<int, IncidentDto> incident){
 				if (_incidents.TryRemove(incident)) {
 					/// TODO: ADD Logging for incident removal
