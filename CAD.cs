@@ -241,7 +241,7 @@ namespace Dievas {
 				return false;
 		}
 
-		public bool removeIncident(int id) {
+		public bool RemoveIncident(int id) {
 			if (_incidents.ContainsKey(id)) {
 				IncidentDto incident = _incidents[id];
 				if (this._removeIncident(id, incident)) return true;

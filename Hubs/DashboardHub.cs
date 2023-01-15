@@ -11,6 +11,7 @@ namespace Dievas.Hubs {
 
     public interface IDashboardHub {
         Task IncidentAdded(IncidentDto incident);
+        Task IncidentRemoved(int incidentId);
         Task IncidentFieldChanged(int incidentId, string field, Object value);
         Task IncidentUnitStatusChanged(int incidentId, UnitAssignmentDto unit);
         Task IncidentCommentAdded(int incidentId, CommentDto comment);
@@ -18,6 +19,7 @@ namespace Dievas.Hubs {
         Task UnitFieldChanged(string radioName, string field, Object value);
         Task GetAllIncidents(int minutesPast);
         Task GetAllUnits();
+        Task IncidentsRemoved(int countRemoved);
     }
 
     //  Here we handle general client communications
@@ -100,7 +102,27 @@ namespace Dievas.Hubs {
             _cad.AddIncident(incident);
             double hoursToKeep = 0;
             Double.TryParse(_config["Hub:HoursToKeepIncidents"], out hoursToKeep);
-            _cad.RemoveClosedIncidents(hoursToKeep);
+            int countRemoved = _cad.RemoveClosedIncidents(hoursToKeep);
+        }
+
+        // Remove Incident
+        public async Task RemoveIncident(int incidentId) {
+            if (_cad.RemoveIncident(incidentId))
+                await Clients.Group("dataFeed").IncidentRemoved(incidentId);
+        }
+
+        // Remove Old Incidents
+        public async Task RemoveOldIncidents() {
+            double hoursToKeep = 0;
+            Double.TryParse(_config["Hub:HoursToKeepIncidents"], out hoursToKeep);
+            int countRemoved = _cad.RemoveClosedIncidents(hoursToKeep);
+            await Clients.Group("dataFeed").IncidentsRemoved(countRemoved);
+        }
+
+        // Remove Old Incidents
+        public async Task RemoveOldIncidentOlderThanHours(double hoursToKeep = 0) {
+            int countRemoved = _cad.RemoveClosedIncidents(hoursToKeep);
+            await Clients.Group("dataFeed").IncidentsRemoved(countRemoved);
         }
 
         // Update incident field
