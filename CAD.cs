@@ -70,7 +70,11 @@ namespace Dievas {
 		// We don't do incident # checking here, for the case where we want to add
 		// an existing incident with new and or updated data
 		public IncidentDto AddIncident(int id, IncidentDto incident){
-			_incidents[id] = incident;
+
+            if (incident.UnitsAssigned.Count > 1)
+                incident.UnitsAssigned = RemoveDuplicateAssignments(incident.UnitsAssigned);
+
+            _incidents[id] = incident;
 			return incident;
 		}
 
@@ -78,9 +82,21 @@ namespace Dievas {
 		// an existing incident with new and or updated data
 		public IncidentDto AddIncident(IncidentDto incident){
 			int id = incident.Id;
-			_incidents[id] = incident;
+
+			if (incident.UnitsAssigned.Count>1)
+                incident.UnitsAssigned = RemoveDuplicateAssignments(incident.UnitsAssigned);
+
+            _incidents[id] = incident;
 			return incident;
 		}
+
+		public List<UnitAssignmentDto> RemoveDuplicateAssignments (List<UnitAssignmentDto> unitAssignments)
+		{
+            return unitAssignments
+				.GroupBy(unit => unit.RadioName)
+				.Select(group => group.OrderByDescending(assignment => assignment.StartDateTime).First())
+				.ToList();
+        }
 
 		// Update incident Field - any updates, we copy out the value, make the update
 		// return the value to the dict
