@@ -110,7 +110,7 @@ namespace Dievas {
 
 			// 2023-01-27 - Removed the use of IndexOf until such time as DTO object support IEquatable<T>
             // var unitKey = incident.UnitsAssigned.IndexOf(unit);
-            var unitKey = incident.UnitsAssigned.FindIndex(u => u.RadioName == unit.RadioName);
+            var unitKey = (incident.UnitsAssigned == null ? -1 : incident.UnitsAssigned.FindIndex(u => u.RadioName == unit.RadioName));
             
             if (unitKey < 0) {
                 incident.UnitsAssigned.Add(unit);
@@ -142,7 +142,8 @@ namespace Dievas {
 
 			// 2023-01-27 - Removed the use of IndexOf until such time as DTO object support IEquatable<T>
             // var unitKey = incident.UnitsAssigned.IndexOf(assignedUnit);
-            var unitKey = incident.UnitsAssigned.FindIndex(u => u.RadioName == assignedUnit.RadioName);
+            // var unitKey = incident.UnitsAssigned.FindIndex(u => u.RadioName == assignedUnit.RadioName);
+            var unitKey = (incident.UnitsAssigned == null ? -1 : incident.UnitsAssigned.FindIndex(u => u.RadioName == assignedUnit.RadioName));
             
             if (unitKey < 0) {
                 incident.UnitsAssigned.Add(assignedUnit);
@@ -160,7 +161,8 @@ namespace Dievas {
 
 			// 2023-01-27 - Removed the use of IndexOf until such time as DTO Objects to IEquatable<T>
 			// var commentKey = incident.Comments.IndexOf(comment);
-			var commentKey = incident.Comments.FindIndex(x => x.Id == comment.Id);
+			// var commentKey = incident.Comments.FindIndex(x => x.Id == comment.Id);
+			var commentKey = (incident.Comments == null ? -1 : incident.Comments.FindIndex(x => x.Id == comment.Id));
 
 
 
