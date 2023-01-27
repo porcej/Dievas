@@ -138,7 +138,10 @@ namespace Dievas {
 
 			if (_incidents.ContainsKey(id)) incident = _incidents[id];
 
-            var unitKey = incident.UnitsAssigned.IndexOf(assignedUnit);
+			// 2023-01-27 - Removed the use of IndexOf until such time as *DTO object support IEquivalnt 
+            // var unitKey = incident.UnitsAssigned.IndexOf(assignedUnit);
+
+            var unitKey = incident.UnitsAssigned.findIndex(u => u.RadioName == assignedUnit.RadioName);
             
             if (unitKey < 0) {
                 incident.UnitsAssigned.Add(assignedUnit);
