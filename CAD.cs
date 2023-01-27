@@ -177,6 +177,81 @@ namespace Dievas {
 			}
 			return initialUnits.Count();
 		}
-		
+
+		/// Remove's all closed incidents older than now - ageToKeep old
+		/// If ageToKeep is null, removes all closed incidents
+		public int RemoveClosedIncidents(TimeSpan? ageToKeep = null) {
+			if (!ageToKeep.HasValue) ageToKeep = TimeSpan.Zero;
+			DateTime ? timeThreshold = DateTime.Now - ageToKeep;
+
+			var oldIncidents = _incidents.Where(i =>
+				timeThreshold >= i.Value.IncidentEndDateTime
+				// timeThreshold.GreaterThanOrEqual<DateTime>(i.Value.IncidentEndDateTime)
+			).ToArray();
+
+			/// TODO: ADD Logging for count
+			/// _logger.log(LogLevel.Debug, "{} incidents older than {} slated for removal.", oldIncidents.length, timeThreshold);
+
+			int count = 0;
+			foreach (var oldIncident in oldIncidents) {
+				if (this._removeIncident(oldIncident)) count++;
+			}
+
+			return count;
+		}
+
+		/// Remove's all closed incidents older than now - ABS(hours), hours old
+		/// If hours is zero, removes all closed incidents
+		public int RemoveClosedIncidents(double hours = 0) {
+			if (hours > 0) hours = hours * -1;
+
+			DateTime timeThreshold = DateTime.Now.AddHours(hours);
+
+			var oldIncidents = _incidents.Where(i =>
+				timeThreshold >= i.Value.IncidentEndDateTime
+				// timeThreshold.GreaterThanOrEqual<DateTime>(i.Value.IncidentEndDateTime)
+			).ToArray();
+
+			/// TODO: ADD Logging for count
+			/// _logger.log(LogLevel.Debug, "{} incidents older than {} slated for removal.", oldIncidents.length, timeThreshold);
+
+			int count = 0;
+			foreach (var oldIncident in oldIncidents) {
+				if (this._removeIncident(oldIncident)) count++;
+			}
+
+			return count;
+		}
+		private bool _removeIncident(KeyValuePair<int, IncidentDto> incident){
+				if (_incidents.TryRemove(incident)) {
+					/// TODO: ADD Logging for incident removal
+					/// _logger.log(LogLevel.Debug, "Removed incident # {}", oldIncident.key);
+					return true;
+				} else {
+					/// TODO: ADD Logging for incident removal failure
+					/// _logger.log(LogLevel.Warn, "Failed to remove incident # {}", oldIncident.key);
+				}
+				return false;
+		}
+
+		private bool _removeIncident(int id, IncidentDto incident) {
+				if (_incidents.TryRemove(id, out incident)) {
+					/// TODO: ADD Logging for incident removal
+					/// _logger.log(LogLevel.Debug, "Removed incident # {}", oldIncident.key);
+					return true;
+				} else {
+					/// TODO: ADD Logging for incident removal failure
+					/// _logger.log(LogLevel.Warn, "Failed to remove incident # {}", oldIncident.key);
+				}
+				return false;
+		}
+
+		public bool RemoveIncident(int id) {
+			if (_incidents.ContainsKey(id)) {
+				IncidentDto incident = _incidents[id];
+				if (this._removeIncident(id, incident)) return true;
+			}
+			return false;
+		}
 	}
 }

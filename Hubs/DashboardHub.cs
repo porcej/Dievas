@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Backend.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Configuration;
 using AFD.Dashboard.Models;
 
 namespace Dievas.Hubs {
 
     public interface IDashboardHub {
         Task IncidentAdded(IncidentDto incident);
+        Task IncidentRemoved(int incidentId);
         Task IncidentFieldChanged(int incidentId, string field, Object value);
         Task IncidentUnitStatusChanged(int incidentId, UnitAssignmentDto unit);
         Task IncidentCommentAdded(int incidentId, CommentDto comment);
@@ -17,6 +19,7 @@ namespace Dievas.Hubs {
         Task UnitFieldChanged(string radioName, string field, Object value);
         Task GetAllIncidents(int minutesPast);
         Task GetAllUnits();
+        Task IncidentsRemoved(int countRemoved);
     }
 
     //  Here we handle general client communications
@@ -24,19 +27,22 @@ namespace Dievas.Hubs {
         
         private static CAD _cad;
 
-        public DashboardHub(CAD cad){
+        private readonly IConfiguration _config;
+
+        public DashboardHub(IConfiguration configuration, CAD cad){
+            _config = configuration;
             _cad = cad;
         }
 
         // Handle clients connecting
         public async Task JoinDashboard() {
-            await Groups.AddToGroupAsync(Context.ConnectionId, "dashboard");
+            await Groups.AddToGroupAsync(Context.ConnectionId, _config["Hub:DashboardHubName"]);
         }
 
         // Handle clients disconnecting
         public async Task LeaveDashboard() {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId,
-                                              "dashboard");
+                                              _config["Hub:DashboardHubName"]);
         }
 
         // Add clients to an incident 
@@ -60,14 +66,14 @@ namespace Dievas.Hubs {
 
         // Handle upstream data sources subscribing to push data
         public async Task JoinDataFeed() {
-            await Groups.AddToGroupAsync(Context.ConnectionId, "dataFeed");
+            await Groups.AddToGroupAsync(Context.ConnectionId, _config["Hub:DatafeedHubName"]);
             await GetAllIncidents(4320);
-            await Clients.Group("dataFeed").GetAllUnits();
+            await Clients.Group(_config["Hub:DatafeedHubName"]).GetAllUnits();
         }
 
         // Handle upstream data sources disconnecting
         public async Task LeaveDataFeed() {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, "dataFeed");
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, _config["Hub:DatafeedHubName"]);
         }
 
         // ***************************************************************************************\
@@ -80,7 +86,7 @@ namespace Dievas.Hubs {
             foreach (var incident in incidents)
             {
                 _cad.AddIncident(incident);
-                await Clients.Group("dashboard").IncidentAdded(incident);
+                await Clients.Group(_config["Hub:DashboardHubName"]).IncidentAdded(incident);
             }
         }
 
@@ -92,44 +98,67 @@ namespace Dievas.Hubs {
 
         // Add new incident
         public async Task IncidentAdded(IncidentDto incident) {
-            await Clients.Group("dashboard").IncidentAdded(incident);
+            await Clients.Group(_config["Hub:DashboardHubName"]).IncidentAdded(incident);
             _cad.AddIncident(incident);
+            double hoursToKeep = 0;
+            Double.TryParse(_config["Hub:HoursToKeepIncidents"], out hoursToKeep);
+            int countRemoved = _cad.RemoveClosedIncidents(hoursToKeep);
+        }
+
+        // Remove Incident
+        public async Task RemoveIncident(int incidentId) {
+            if (_cad.RemoveIncident(incidentId))
+                await Clients.Group(_config["Hub:DatafeedHubName"]).IncidentRemoved(incidentId);
+        }
+
+        // Remove Old Incidents
+        public async Task RemoveOldIncidents() {
+            double hoursToKeep = 0;
+            Double.TryParse(_config["Hub:HoursToKeepIncidents"], out hoursToKeep);
+            int countRemoved = _cad.RemoveClosedIncidents(hoursToKeep);
+            await Clients.Group(_config["Hub:DatafeedHubName"]).IncidentsRemoved(countRemoved);
+        }
+
+        // Remove Old Incidents
+        public async Task RemoveOldIncidentOlderThanHours(double hoursToKeep = 0) {
+            int countRemoved = _cad.RemoveClosedIncidents(hoursToKeep);
+            await Clients.Group(_config["Hub:DatafeedHubName"]).IncidentsRemoved(countRemoved);
         }
 
         // Update incident field
         public async Task IncidentFieldChanged(int incidentId, string field, string value){
-            await Clients.Group("dashboard").IncidentFieldChanged(incidentId, field, value);
+            await Clients.Group(_config["Hub:DashboardHubName"]).IncidentFieldChanged(incidentId, field, value);
             _cad.UpdateIncidentField(incidentId, field, value);
         }
 
         // Change unit status
         public async Task IncidentUnitStatusChanged(int incidentId, UnitAssignmentDto unit){
-            await Clients.Group("dashboard").IncidentUnitStatusChanged(incidentId, unit);
+            await Clients.Group(_config["Hub:DashboardHubName"]).IncidentUnitStatusChanged(incidentId, unit);
             _cad.AddOrUpdateIncidentUnit(incidentId, unit);
         }
 
         // Add comment to incidnet
         public async Task IncidentCommentAdded(int incidentId, CommentDto comment) {
-            await Clients.Group("dashboard").IncidentCommentAdded(incidentId, comment);
+            await Clients.Group(_config["Hub:DashboardHubName"]).IncidentCommentAdded(incidentId, comment);
             _cad.AddOrUpdateIncidentComment(incidentId, comment);
         }
 
         // Update unit status for non-incidents
         public async Task UnitStatusChanged(string radioName, int statusId) {
-            await Clients.Group("dashboard").UnitStatusChanged(radioName, statusId);
+            await Clients.Group(_config["Hub:DashboardHubName"]).UnitStatusChanged(radioName, statusId);
             _cad.UpdateUnitStatus(radioName, statusId);
         }
 
         public async Task UnitFieldChanged(string radioName, string field, string value)
         {
-            await Clients.Group("dashboard").UnitFieldChanged(radioName, field, value);
+            await Clients.Group(_config["Hub:DashboardHubName"]).UnitFieldChanged(radioName, field, value);
             _cad.UpdateUnitField(radioName, field, value);
         }
 
         // ***************************************************************************************\
         // ***************************************************************************************/
         // Please update below to handle incoming data
-        // * The Dashboard clients accept the following actions sent to the "dashboard" group:
+        // * The Dashboard clients accept the following actions sent to the _config["Hub:DashboardHubName"] group:
         //      * IncidentAdded(incident)
         //          - incident is of class Backend.Models.Incident
 
@@ -156,7 +185,7 @@ namespace Dievas.Hubs {
                 UnitsAssigned = new List<UnitAssignmentDto>{ new UnitAssignmentDto { RadioName = radioName, StatusId = 1 } }
             };
 
-            await Clients.Group("dashboard").IncidentAdded(incident);
+            await Clients.Group(_config["Hub:DashboardHubName"]).IncidentAdded(incident);
             _cad.AddIncident(incident);
         }
         public async Task UpdateIncidentType(int incidentId, string newIncidentType){
@@ -169,7 +198,7 @@ namespace Dievas.Hubs {
 
         public async Task GetAllIncidents(int minutesPast)
         {
-            await Clients.Group("dataFeed").GetAllIncidents(minutesPast);
+            await Clients.Group(_config["Hub:DatafeedHubName"]).GetAllIncidents(minutesPast);
         }
     }
 }
