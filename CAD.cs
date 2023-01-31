@@ -15,12 +15,8 @@ namespace Dievas {
 
 		private readonly ConcurrentDictionary<string, UnitDto> _units = new ConcurrentDictionary<string, UnitDto>();
 
-		public IEnumerable GetUnits() {
+		public IEnumerable<UnitDto> GetUnits() {
 			return _units.Values.OrderBy( t => t.RadioName );
-		}
-
-		public IEnumerable GetUnitsByStation(string station) {
-			return _units.Values.Where(t => t.HomeStation == station).OrderBy( t => t.RadioName );
 		}
 
 		public UnitDto GetUnitByName(string radioName) {
