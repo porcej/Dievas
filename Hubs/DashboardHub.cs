@@ -85,8 +85,8 @@ namespace Dievas.Hubs {
         {
             foreach (var incident in incidents)
             {
-                _cad.AddIncident(incident);
-                await Clients.Group(_config["Hub:DashboardHubName"]).IncidentAdded(incident);
+                var addedIncident = _cad.AddIncident(incident);
+                await Clients.Group(_config["Hub:DashboardHubName"]).IncidentAdded(addedIncident);
             }
         }
 
@@ -98,8 +98,9 @@ namespace Dievas.Hubs {
 
         // Add new incident
         public async Task IncidentAdded(IncidentDto incident) {
-            await Clients.Group(_config["Hub:DashboardHubName"]).IncidentAdded(incident);
-            _cad.AddIncident(incident);
+            var addedIncident = _cad.AddIncident(incident);
+            await Clients.Group(_config["Hub:DashboardHubName"]).IncidentAdded(addedIncident);
+            
             double hoursToKeep = 0;
             Double.TryParse(_config["Hub:HoursToKeepIncidents"], out hoursToKeep);
             int countRemoved = _cad.RemoveClosedIncidents(hoursToKeep);
