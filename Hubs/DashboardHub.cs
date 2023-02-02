@@ -67,7 +67,7 @@ namespace Dievas.Hubs {
         // Handle upstream data sources subscribing to push data
         public async Task JoinDataFeed() {
             await Groups.AddToGroupAsync(Context.ConnectionId, _config["Hub:DatafeedHubName"]);
-            await GetAllIncidents(4320);
+            await GetAllIncidents((int)(_config.GetValue<double>("Hub:HoursToKeepIncidents") * 60));
             await Clients.Group(_config["Hub:DatafeedHubName"]).GetAllUnits();
         }
 
