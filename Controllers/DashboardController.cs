@@ -55,9 +55,12 @@ namespace Dievas.Controllers {
         }
 
         [HttpGet("units")]
-        public IEnumerable GetUnits()
-        {
-            return _cad.GetUnits();
+        public IEnumerable GetUnits([FromQuery] string currentJurisdiction, [FromQuery] string currentStation,[FromQuery] string homeJurisdiction, [FromQuery] string homeStation){
+            return _cad.GetUnits().Where(unit =>
+                            (currentJurisdiction is null || unit.CurrentJurisdiction == currentJurisdiction)
+                            && (homeJurisdiction is null || unit.HomeJurisdiction == homeJurisdiction)
+                            && (currentStation is null || unit.CurrentStation == currentStation)
+                            && (homeStation is null || unit.HomeStation == homeStation));
         }
 
         // Web API for data feeds to add incident information
