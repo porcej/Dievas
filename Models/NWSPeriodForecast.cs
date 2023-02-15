@@ -1,6 +1,6 @@
 using System;
 
-namespace Backend.Models {
+namespace Dievas.Models {
 
     public class NWSPeriodForecast {
         public int Number { get; set; }
