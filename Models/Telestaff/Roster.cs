@@ -13,12 +13,12 @@ namespace Dievas.Models.Telestaff {
 		/// 	Roster Date
 		/// </summary>
 		[JsonProperty("date")]
-		public DateTime? Date { get; set; }
+		public DateTime Date { get; set; }
 
 		/// <summary>
 		/// 	List of roster records on date
 		/// </summary>
 		[JsonProperty("records")]
-		public List<RosterRecord>? records { get; set; }
+		public List<RosterRecord> records { get; set; }
     }
 }

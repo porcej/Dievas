@@ -13,12 +13,12 @@ namespace Dievas.Models.Telestaff {
 		/// 	Formula id expression
 		/// </summary>
 		[JsonProperty("expression")]
-		public string? Expression { get; set; }
+		public string Expression { get; set; }
 
 		/// <summary>
 		/// 	Formula id evaluated value
 		/// </summary>
 		[JsonProperty("value")]
-		public string? Value { get; set; }
+		public string Value { get; set; }
     }
 }

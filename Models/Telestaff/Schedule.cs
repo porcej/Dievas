@@ -13,12 +13,12 @@ namespace Dievas.Models.Telestaff {
 		/// 	Person details
 		/// </summary>
 		[JsonProperty("person")]
-		public SchedulePerson? Person { get; set; }
+		public SchedulePerson Person { get; set; }
 
 		/// <summary>
 		/// 	List of person schedules
 		/// </summary>
 		[JsonProperty("personSchedule")]
-		public List<PersonSchedule>? PersonSchedule { get; set; }
+		public List<PersonSchedule> PersonSchedule { get; set; }
     }
 }

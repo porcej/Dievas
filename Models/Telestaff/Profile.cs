@@ -13,42 +13,42 @@ namespace Dievas.Models.Telestaff {
 		/// 	Abbreviation of entity
 		/// </summary>
 		[JsonProperty("abbreviation")]
-		public string? Abbreviation { get; set; }
+		public string Abbreviation { get; set; }
 
 		/// <summary>
 		/// 	entity is disabled or not
 		/// </summary>
 		[JsonProperty("disabled")]
-		public bool? Disabled { get; set; }
+		public bool Disabled { get; set; }
 
 		/// <summary>
 		/// 	external system id of the profile
 		/// </summary>
 		[JsonProperty("externalId")]
-		public string? ExternalId { get; set; }
+		public string ExternalId { get; set; }
 
 		/// <summary>
 		/// 	Formula Id assigned to profile
 		/// </summary>
 		[JsonProperty("formulaId")]
-		public FormulaId? FormulaId { get; set; }
+		public FormulaId FormulaId { get; set; }
 
 		/// <summary>
 		/// 	Internal identifier of entity
 		/// </summary>
 		[JsonProperty("id")]
-		public int? Id { get; set; }
+		public int Id { get; set; }
 
 		/// <summary>
 		/// 	Name of entity
 		/// </summary>
 		[JsonProperty("name")]
-		public string? Name { get; set; }
+		public string Name { get; set; }
 
 		/// <summary>
 		/// 	Specialities assigned to profile
 		/// </summary>
 		[JsonProperty("specialities")]
-		public string? Specialities { get; set; }
+		public string Specialities { get; set; }
     }
 }

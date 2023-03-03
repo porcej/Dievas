@@ -13,12 +13,12 @@ namespace Dievas.Models.Telestaff {
 		/// 	Labor Category value ,
 		/// </summary>
 		[JsonProperty("laborCategoryEntry")]
-		public string? LaborCategoryEntry { get; set; }
+		public string LaborCategoryEntry { get; set; }
 
 		/// <summary>
 		/// 	Labor Category name
 		/// </summary>
 		[JsonProperty("laborCategoryName")]
-		public string? LaborCategoryName { get; set; }
+		public string LaborCategoryName { get; set; }
     }
 }

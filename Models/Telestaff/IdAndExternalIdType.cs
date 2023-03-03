@@ -13,13 +13,13 @@ namespace Dievas.Models.Telestaff {
 		/// 	Should be unique for each node and type combination.
 		/// </summary>
 		[JsonProperty("externalId")]
-		public string? ExternalId { get; set; }
+		public string ExternalId { get; set; }
 
 		/// <summary>
 		/// 	Organization Id
 		/// </summary>
 		[JsonProperty("Id")]
-		public int? Id { get; set; }
+		public int Id { get; set; }
 
 		/// <summary>
 		/// 	Name of the Organization

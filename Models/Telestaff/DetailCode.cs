@@ -13,18 +13,18 @@ namespace Dievas.Models.Telestaff {
 		/// 	Detail code abbreviation ,
 		/// </summary>
 		[JsonProperty("abrv")]
-		public string? Abrv { get; set; }
+		public string Abrv { get; set; }
 
 		/// <summary>
 		/// 	Detail code id ,
 		/// </summary>
 		[JsonProperty("id")]
-		public int? Id { get; set; }
+		public int Id { get; set; }
 
 		/// <summary>
 		/// 	Detail code name
 		/// </summary>
 		[JsonProperty("name")]
-		public string? Name { get; set; }
+		public string Name { get; set; }
     }
 }

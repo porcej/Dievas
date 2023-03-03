@@ -13,12 +13,12 @@ namespace Dievas.Models.Telestaff {
 		/// 	Type of behaviour
 		/// </summary>
 		[JsonProperty("behavior")]
-		public string? Behavior { get; set; }
+		public string Behavior { get; set; }
 
 		/// <summary>
 		/// 	To designate whether this code should be logged
 		/// </summary>
 		[JsonProperty("status")]
-		public string? Status { get; set; }
+		public string Status { get; set; }
     }
 }

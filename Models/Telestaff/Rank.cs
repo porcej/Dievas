@@ -13,24 +13,24 @@ namespace Dievas.Models.Telestaff {
 		/// 	Abbreviation of entity
 		/// </summary>
 		[JsonProperty("abbreviation")]
-		public string? Abbreviation { get; set; }
+		public string Abbreviation { get; set; }
 
 		/// <summary>
 		/// 	entity is disabled or not
 		/// </summary>
 		[JsonProperty("disabled")]
-		public bool? Disabled { get; set; }
+		public bool Disabled { get; set; }
 
 		/// <summary>
 		/// 	External Id of Rank
 		/// </summary>
 		[JsonProperty("externalId")]
-		public string? ExternalId { get; set; }
+		public string ExternalId { get; set; }
 
 		/// <summary>
 		/// 	Internal identifier o
 		/// </summary>
 		[JsonProperty("id")]
-		public int? Id { get; set; }
+		public int Id { get; set; }
     }
 }

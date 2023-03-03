@@ -13,12 +13,12 @@ namespace Dievas.Models.Telestaff {
 		/// 	Date details
 		/// </summary>
 		[JsonProperty("date")]
-		public DateTime? date { get; set; }
+		public DateTime date { get; set; }
 
 		/// <summary>
 		/// 	List of schedules for that day
 		/// </summary>
 		[JsonProperty("schedule")]
-		public List<Schedule>? Schedule { get; set; }
+		public List<Schedule> Schedule { get; set; }
     }
 }

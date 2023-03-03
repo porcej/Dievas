@@ -13,7 +13,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	Internal identifier of entity
 		/// </summary>
 		[JsonProperty("id")]
-		public int? Id { get; set; }
+		public int Id { get; set; }
 
 		/// <summary>
 		/// 	Name of the entity

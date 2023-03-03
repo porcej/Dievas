@@ -13,43 +13,43 @@ namespace Dievas.Models.Telestaff {
 		/// 	Agency details
 		/// </summary>
 		[JsonProperty("agency")]
-		public ScheduleOrganizationNode? Agency { get; set; }
+		public ScheduleOrganizationNode Agency { get; set; }
 
 		/// <summary>
 		/// 	Institution details
 		/// </summary>
 		[JsonProperty("institution")]
-		public ScheduleOrganizationNode? Institution { get; set; }
+		public ScheduleOrganizationNode Institution { get; set; }
 
 		/// <summary>
 		/// 	Physical Unit details
 		/// </summary>
 		[JsonProperty("physicalUnit")]
-		public ScheduleOrganizationNode? PhysicalUnit { get; set; }
+		public ScheduleOrganizationNode PhysicalUnit { get; set; }
 
 		/// <summary>
 		/// 	Position details
 		/// </summary>
 		[JsonProperty("position")]
-		public ScheduleOrganizationNode? Position { get; set; }
+		public ScheduleOrganizationNode Position { get; set; }
 
 		/// <summary>
 		/// 	Region details
 		/// </summary>
 		[JsonProperty("region")]
-		public ScheduleOrganizationNode? Region { get; set; }
+		public ScheduleOrganizationNode Region { get; set; }
 
 		/// <summary>
 		/// 	Station details
 		/// </summary>
 		[JsonProperty("station")]
-		public ScheduleOrganizationNode? Station { get; set; }
+		public ScheduleOrganizationNode Station { get; set; }
 
 		/// <summary>
 		/// 	Unit details
 		/// </summary>
 		[JsonProperty("unit")]
-		public ScheduleOrganizationNode? Unit { get; set; }
+		public ScheduleOrganizationNode Unit { get; set; }
 
     }
 }

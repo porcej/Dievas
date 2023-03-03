@@ -13,43 +13,43 @@ namespace Dievas.Models.Telestaff {
 		/// 	Abbreviation of entity
 		/// </summary>
 		[JsonProperty("abbreviation")]
-		public string? Abbreviation { get; set; }
+		public string Abbreviation { get; set; }
 
 		/// <summary>
 		/// 	Attachments for the shift for that shift calender day
 		/// </summary>
 		[JsonProperty("attachments")]
-		public List<string>? Attachments { get; set; }
+		public List<string> Attachments { get; set; }
 
 		/// <summary>
 		/// 	entity is disabled or not
 		/// </summary>
 		[JsonProperty("disabled")]
-		public bool? Disabled { get; set; }
+		public bool Disabled { get; set; }
 
 		/// <summary>
 		/// 	Shift end time for the calendar day if shift is active on that day
 		/// </summary>
 		[JsonProperty("endTime")]
-		public DateTime? EndTime { get; set; }
+		public DateTime EndTime { get; set; }
 
 		/// <summary>
 		/// 	Internal identifier of entity
 		/// </summary>
 		[JsonProperty("id")]
-		public int? Id { get; set; }
+		public int Id { get; set; }
 
 		/// <summary>
 		/// 	Name of entity
 		/// </summary>
 		[JsonProperty("name")]
-		public string? Name { get; set; }
+		public string Name { get; set; }
 
 		/// <summary>
 		/// 	Shift start time for the calendar day if shift is active on that day
 		/// </summary>
 		[JsonProperty("startTime")]
-		public DateTime? StartTime { get; set; }
+		public DateTime StartTime { get; set; }
 
     }
 }

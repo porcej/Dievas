@@ -13,7 +13,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	Attachments for the person for that calender day
 		/// </summary>
 		[JsonProperty("attachments")]
-		public List<string>? Attachments { get; set; }
+		public List<string> Attachments { get; set; }
 
 		/// <summary>
 		/// 	Person Employee Id

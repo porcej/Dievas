@@ -13,30 +13,30 @@ namespace Dievas.Models.Telestaff {
 		/// 	Minimum percentage that the Work Code's length must match in order for the modification of the Assignment to occur
 		/// </summary>
 		[JsonProperty("assignmentDurationMinPercentage")]
-		public float? AssignmentDurationMinPercentage { get; set; }
+		public float AssignmentDurationMinPercentage { get; set; }
 
 		/// <summary>
 		/// 	Percentage that the Work Code must overlap the Assignment in order for the modification of the Assignment to occur
 		/// </summary>
 		[JsonProperty("assignmentOverlapMinimumPercentage")]
-		public float? AssignmentOverlapMinimumPercentage { get; set; }
+		public float AssignmentOverlapMinimumPercentage { get; set; }
 
 		/// <summary>
 		/// 	To perform the overlap Assignment check in order to determine the default state of the suppress Assignments
 		/// </summary>
 		[JsonProperty("enableAssignmentOverlapCheck")]
-		public bool? EnableAssignmentOverlapCheck { get; set; }
+		public bool EnableAssignmentOverlapCheck { get; set; }
 
 		/// <summary>
 		/// 	To suppress the shift Assignment using Work Code
 		/// </summary>
 		[JsonProperty("suppressAssignment")]
-		public bool? SuppressAssignment { get; set; }
+		public bool SuppressAssignment { get; set; }
 
 		/// <summary>
 		/// 	To automatically suppress the shift assignment vacancy on the Roster when applying a nonworking type Work Code to this Work Code
 		/// </summary>
 		[JsonProperty("suppressAssignmentVacancy")]
-		public bool? SuppressAssignmentVacancy { get; set; }
+		public bool SuppressAssignmentVacancy { get; set; }
     }
 }

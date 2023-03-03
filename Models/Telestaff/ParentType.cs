@@ -19,7 +19,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	Organization Id of parent
 		/// </summary>
 		[JsonProperty("parentId")]
-		public int? ParentId { get; set; }
+		public int ParentId { get; set; }
 
 		/// <summary>
 		/// 	Organization type of the parent = ['INSTITUTION/AGENCY/REGION/STATION/UNIT']

@@ -12,7 +12,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	Abbreviation of the Job Title
 		/// </summary>
 		[JsonProperty("abbreviation")]
-		public string? Abbreviation { get; set; }
+		public string Abbreviation { get; set; }
 
 		/// <summary>
 		/// 	Job Title Status

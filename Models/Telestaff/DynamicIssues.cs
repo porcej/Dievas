@@ -13,12 +13,12 @@ namespace Dievas.Models.Telestaff {
 		/// 	Dynamic issue name
 		/// </summary>
 		[JsonProperty("dynamicIssue")]
-		public string? DynamicIssue { get; set; }
+		public string DynamicIssue { get; set; }
 
 		/// <summary>
 		/// 	Status of Dynamic issue.Can be Applies/Does Not Apply/Contributes to group
 		/// </summary>
 		[JsonProperty("status")]
-		public string? Status { get; set; }
+		public string Status { get; set; }
     }
 }

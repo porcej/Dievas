@@ -13,12 +13,12 @@ namespace Dievas.Models.Telestaff {
 		/// 	Name of cost center. This is generally derived from Account field. ,
 		/// </summary>
 		[JsonProperty("name")]
-		public string? Name { get; set; }
+		public string Name { get; set; }
 
 		/// <summary>
 		/// 	Reference of cost center
 		/// </summary>
 		[JsonProperty("ref")]
-		public string? Ref { get; set; }
+		public string Ref { get; set; }
     }
 }
