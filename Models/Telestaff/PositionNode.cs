@@ -14,7 +14,5 @@ namespace Dievas.Models.Telestaff {
 		/// </summary>
 		[JsonProperty("jobTitle")]
 		public JobTitle JobTitle { get; set; }
-
-
     }
 }

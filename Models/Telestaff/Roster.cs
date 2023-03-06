@@ -19,6 +19,6 @@ namespace Dievas.Models.Telestaff {
 		/// 	List of roster records on date
 		/// </summary>
 		[JsonProperty("records")]
-		public List<RosterRecord> records { get; set; }
+		public List<RosterRecord> Records { get; set; }
     }
 }
