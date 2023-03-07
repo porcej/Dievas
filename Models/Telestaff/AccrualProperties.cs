@@ -13,7 +13,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	Defines the number of hours/counts that can transfer from one period to the next
 		/// </summary>
 		[JsonProperty("carry")]
-		public float Carry { get; set; }
+		public double Carry { get; set; }
 
 		/// <summary>
 		/// 	The default effective date used when calculating accrual balances
@@ -31,7 +31,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	This field is only valid for working codes. Defines the maximum amount of hours/counts per person allowed in this Accrual Group
 		/// </summary>
 		[JsonProperty("minMax")]
-		public float MinMax { get; set; }
+		public double MinMax { get; set; }
 
 		/// <summary>
 		/// 	Defines when an Accrual Balance starts. Any records prior to the given date are ignored
@@ -43,7 +43,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	The rate at which to accrue either Count or Hours for the selected Work Code
 		/// </summary>
 		[JsonProperty("rate")]
-		public float Rate { get; set; }
+		public double Rate { get; set; }
 
 		/// <summary>
 		/// 	Indicates if unapproved requests records should be considered part of the accrual balance for this Work Code

@@ -67,7 +67,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	payDurationIn
 		/// </summary>
 		[JsonProperty("payDurationIn")]
-		public int PayDurationIn { get; set; }
+		public double PayDurationIn { get; set; }
 
 		/// <summary>
 		/// 	Physical unit abbreviation
@@ -229,7 +229,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	shiftDurationIn
 		/// </summary>
 		[JsonProperty("shiftDurationIn")]
-		public int ShiftDurationIn { get; set; }
+		public double ShiftDurationIn { get; set; }
 
 		/// <summary>
 		/// 	End date of the shift
@@ -277,7 +277,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	Duration of the staffing
 		/// </summary>
 		[JsonProperty("staffingDurationIn")]
-		public int StaffingDurationIn { get; set; }
+		public double StaffingDurationIn { get; set; }
 
 		/// <summary>
 		/// 	End date of the staffing
@@ -362,23 +362,5 @@ namespace Dievas.Models.Telestaff {
 		/// </summary>
 		[JsonProperty("wstatPayrollCh")]
 		public string WstatPayrollCh { get; set; }
-
-		/// <summary>
-		/// 	Position uniqie identifier
-		/// </summary>
-		[JsonProperty("positionId")]
-		public int PositionId { get; set; }
-
-		/// <summary>
-		/// 	Position name
-		/// </summary>
-		[JsonProperty("positionName")]
-		public string PositionName { get; set; }
-
-		/// <summary>
-		/// 	Position name in an organizational hierachy string
-		/// </summary>
-		[JsonProperty("positionDisplayName")]
-		public string PositionDisplayName { get; set; }
     }
 }

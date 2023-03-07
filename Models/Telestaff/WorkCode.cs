@@ -16,7 +16,7 @@ namespace Dievas.Models.Telestaff {
 		public string Abrv { get; set; }
 
 		/// <summary>
-		/// 	Stores additional payroll data such as the cost center or project float paying for this staffing record
+		/// 	Stores additional payroll data such as the cost center or project double paying for this staffing record
 		/// </summary>
 		[JsonProperty("account")]
 		public string Account { get; set; }
@@ -46,7 +46,7 @@ namespace Dievas.Models.Telestaff {
 		public FlexibleTime FlexibleTime { get; set; }
 
 		/// <summary>
-		/// 	The Accrual Group float is used primarily to track selected Work Codes and their related accrual floats
+		/// 	The Accrual Group double is used primarily to track selected Work Codes and their related accrual doubles
 		/// </summary>
 		[JsonProperty("group")]
 		public int Group { get; set; }
@@ -79,13 +79,13 @@ namespace Dievas.Models.Telestaff {
 		/// 	Defines a maximum hours limit for the Work Code. The Work Code cannot be used unless the hours specified are equal to or less than the amount of hours entered in this field
 		/// </summary>
 		[JsonProperty("maxHours")]
-		public float MaxHours { get; set; }
+		public double MaxHours { get; set; }
 
 		/// <summary>
 		/// 	Defines a minimum hours limit for the Work Code. The Work Code cannot be used unless the hours specified are equal to or greater than the amount of hours entered in this field
 		/// </summary>
 		[JsonProperty("minHours")]
-		public float MinHours { get; set; }
+		public double MinHours { get; set; }
 
 		/// <summary>
 		/// 	name
@@ -127,7 +127,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	Defines cost information for the selected Work Code and used on the Cost Report when Wage information for the Person.
 		/// </summary>
 		[JsonProperty("wageFactor")]
-		public float WageFactor { get; set; }
+		public double WageFactor { get; set; }
 
 		/// <summary>
 		/// 	Additional properties that allows to configure the work code behaviour i.e By adding approval,detail code,account,start time,end time and others

@@ -97,7 +97,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	Schedule duration in hours ,
 		/// </summary>
 		[JsonProperty("durationInHours")]
-		public float DurationInHours { get; set; }
+		public double DurationInHours { get; set; }
 
 		/// <summary>
 		/// 	Schedule duration in seconds ,
@@ -145,7 +145,7 @@ namespace Dievas.Models.Telestaff {
 		/// 	Schedule payroll duration in hours ,
 		/// </summary>
 		[JsonProperty("payrollDurationInHours")]
-		public float PayrollDurationInHours { get; set; }
+		public double PayrollDurationInHours { get; set; }
 
 		/// <summary>
 		/// 	Schedule payroll duration in seconds ,

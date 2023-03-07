@@ -13,13 +13,13 @@ namespace Dievas.Models.Telestaff {
 		/// 	Minimum percentage that the Work Code's length must match in order for the modification of the Assignment to occur
 		/// </summary>
 		[JsonProperty("assignmentDurationMinPercentage")]
-		public float AssignmentDurationMinPercentage { get; set; }
+		public double AssignmentDurationMinPercentage { get; set; }
 
 		/// <summary>
 		/// 	Percentage that the Work Code must overlap the Assignment in order for the modification of the Assignment to occur
 		/// </summary>
 		[JsonProperty("assignmentOverlapMinimumPercentage")]
-		public float AssignmentOverlapMinimumPercentage { get; set; }
+		public double AssignmentOverlapMinimumPercentage { get; set; }
 
 		/// <summary>
 		/// 	To perform the overlap Assignment check in order to determine the default state of the suppress Assignments
