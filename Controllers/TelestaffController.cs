@@ -25,13 +25,13 @@ using System.ComponentModel;
 namespace Dievas.Controllers {
 
     /// <summary>
-    ///     Controller Class <c>TelestaffAPIProxyController</c> Provided an API to access staffing information
+    ///     Controller Class <c>TelestaffController</c> Provided an API to access staffing information
     ///     
     ///     TODO: UPDATE Handling roster records with request = true
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    public class TelestaffAPIProxyController : ControllerBase {
+    public class TelestaffController : ControllerBase {
 
         /// <summary>
         ///     Application configuration for this Class
@@ -41,7 +41,7 @@ namespace Dievas.Controllers {
         /// <summary>
         ///     Logging Controller for this class
         /// </summary>
-        private readonly ILogger<TelestaffAPIProxyController> _logger;
+        private readonly ILogger<TelestaffController> _logger;
 
         /// <summary>
         ///     Web Client for this class
@@ -55,12 +55,12 @@ namespace Dievas.Controllers {
         private static readonly ConcurrentDictionary<DateTime, StaffingCache> _rosters = new ConcurrentDictionary<DateTime, StaffingCache>();
         
         /// <summary>
-        ///     Default constructor for Class <c>TelestaffAPIProxyController</c>
+        ///     Default constructor for Class <c>TelestaffController</c>
         /// </summary>
         /// <param name="configuration">IConfiguration configuration informaiton</param>
         /// <param name="logger">ILogger: aggregate logger</param>
-        public TelestaffAPIProxyController(IConfiguration configuration,
-                                        ILogger<TelestaffAPIProxyController> logger) {
+        public TelestaffController(IConfiguration configuration,
+                                        ILogger<TelestaffController> logger) {
             _config = configuration;
             _logger = logger;
 
