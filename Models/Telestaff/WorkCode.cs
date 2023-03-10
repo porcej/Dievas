@@ -144,7 +144,9 @@ namespace Dievas.Models.Telestaff {
 		/// <summary>
 		/// 	Work Code type defines behaviour of work code. It can be WORKING/NON-WORKING/REGULAR DUTY/SIGN UP
 		/// </summary>
-		[JsonProperty("workCodeType")]
-		public NameAndId WorkCodeType { get; set; }
+		// [JsonProperty("workCodeType")]
+		// public NameAndId WorkCodeType { get; set; }
+		[JsonProperty("type")]
+		public string Type { get; set; }
     }
 }
