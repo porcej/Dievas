@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Dievas.Models.Telestaff;
 using Newtonsoft.Json;
 
-namespace Dievas.Models {
+namespace Dievas.Models.Staffing {
 
    	/// <summary>
     ///     Class <c>StaffingRecord</c> Staffing record for dashboarding purposes
