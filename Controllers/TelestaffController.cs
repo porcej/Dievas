@@ -48,7 +48,6 @@ namespace Dievas.Controllers {
         /// </summary>
         private static HttpClient _http;
 
-
         /// <summary>
         ///     Holds roster data keyed by date
         /// </summary>
