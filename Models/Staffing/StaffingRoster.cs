@@ -10,6 +10,15 @@ namespace Dievas.Models.Staffing {
     /// </summary>
 	public class StaffingRoster {
 
+
+	    /// <summary>
+	    /// 	Constructor
+	    ///	</summary>
+	    public StaffingRoster(DateTime rosterDate, List<StaffingRecord> records) {
+			RosterDate = rosterDate;
+			Records = records;
+	    }
+
 	    /// <summary>
 	    /// 	Date for this roster information
 	    ///	</summary>

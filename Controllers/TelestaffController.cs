@@ -95,7 +95,30 @@ namespace Dievas.Controllers {
             // Handle user authentication for all requests
             var byteArray = Encoding.ASCII.GetBytes($"{_config["Telestaff:Username"]}:{_config["Telestaff:Password"]}");
             _http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+
+
+
+        /// ****************************************************************************************
+        /// *  TEST HARNESS NOT FOR PRODUCTION
+            List<UnitDto> testUnits = JsonConvert.DeserializeObject<List<UnitDto>>(populateTestUnits());
+            _cad.PopulateUnitList(testUnits);
+        /// * END TEST HARNESS
+        /// ****************************************************************************************
         }
+
+
+        /// ****************************************************************************************
+        /// *  TEST METHOD NOT FOR PRODUCTION
+        private string populateTestUnits(){
+            // var baseAddress = _http.BaseAddress;
+            string endpoint  = "https://sfireweb2.alexgov.net/DashboardApi/api/Dashboard/units";
+            HttpResponseMessage result = _http.GetAsync(endpoint).Result;
+
+                return result.Content.ReadAsStringAsync().Result;
+
+        }
+        /// * END TEST METHOD
+        /// ****************************************************************************************
 
 
         /// <summary>
@@ -387,10 +410,7 @@ namespace Dievas.Controllers {
                 }
                 records.Add(record);
             }
-            return new StaffingRoster {
-                RosterDate = roster.Date,
-                Records = records
-            };
+            return new StaffingRoster (roster.Date, records);
         }
 
 
@@ -399,17 +419,40 @@ namespace Dievas.Controllers {
         /// </summary>
         /// <param name="roster">StaffingRoster holding data to be filtered</param>
         /// <param name="station">String representing a station</param>
-        private StaffingRoster filterRosterByStation(StaffingRoster roster, string station = "") {
+        /// <param name="offRoster">Boolean iff includes off roster records</param>
+        private StaffingRoster filterRosterByStation(StaffingRoster roster, string station = "", bool offRoster = false) {
             if (string.IsNullOrWhiteSpace(station)) return roster;
 
             // Get the units assigned to the station from CAD
             List<string> homedUnits = _cad.GetUnits()
-                                          .Where(unit => unit.HomeJurisdiction == station)
+                                          .Where(unit => unit.HomeStation == station)
                                           .Select(unit => unit.RadioName)
                                           .ToList();
 
-            roster.Records = roster.Records.FindAll(record => homedUnits.Contains(record.UnitName) || (record.StationName != null && record.StationName.Contains(station)));
-            return roster;
+
+            Console.WriteLine("===============================================");
+            Console.WriteLine($"==== {station} ====");
+            Console.WriteLine("===============================================");
+            Console.WriteLine("Homed Units: ");
+            Console.WriteLine(JsonConvert.SerializeObject(homedUnits));
+            // Console.WriteLine("================================================");
+            // Console.WriteLine("================================================");
+            // Console.WriteLine(JsonConvert.SerializeObject(roster));
+            List<StaffingRecord> records = roster.Records.FindAll(record => 
+                            homedUnits.Contains(record.UnitName) || homedUnits.Contains(record.UnitAbbreviation)
+                            || (record.StationName != null && record.StationName.Contains(station))
+                            || (record.StationAbbreviation != null && record.StationAbbreviation.Contains(station)));
+
+            if (!offRoster) {
+                records = records.FindAll(record => record.IsWorking && !record.IsRequest && record.UnitName != "{off roster}");
+            }
+
+            // roster.Records = roster.Records.FindAll(record => homedUnits.Contains(record.UnitName) || (record.StationName != null && record.StationName.Contains(station)));
+
+            // Console.WriteLine(JsonConvert.SerializeObject(roster));
+            // Console.WriteLine("================================================");
+            // Console.WriteLine("================================================");
+            return new StaffingRoster(roster.RosterDate, records);
         }
 
         /// <summary>
@@ -417,7 +460,8 @@ namespace Dievas.Controllers {
         /// </summary>
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <param name="station">Station information to filter the roster records on</param>
-        private StaffingRoster getStaffingForDate(DateTime date, string station = ""){
+        /// <param name="offRoster">Boolean iff includes off roster records</param>
+        private StaffingRoster getStaffingForDate(DateTime date, string station = "", bool offRoster = false) {
             DateTime now = DateTime.Now;
 
             // Make sure we have a date and not a date & time to key on
@@ -428,7 +472,7 @@ namespace Dievas.Controllers {
                 
                 // Check if our data is expired
                 if (_rosters[date].IsValid()) {
-                    return filterRosterByStation(_rosters[date].Roster, station);
+                    return filterRosterByStation(_rosters[date].Roster, station, offRoster);
                 }
             }
 
@@ -455,7 +499,7 @@ namespace Dievas.Controllers {
                     }
                 }
             );
-            return filterRosterByStation(roster, station);
+            return filterRosterByStation(roster, station, offRoster);
         }
 
 
@@ -464,9 +508,11 @@ namespace Dievas.Controllers {
         /// </summary>
         /// <returns> JSON formated string representation of the staffing information for the current calendar day</returns>
         [HttpGet("staffing")]
-        public string GetStaffing([FromQuery] string station) {
+        public string GetStaffing([FromQuery] string station, [FromQuery] string offRoster) {
+            bool isOffRoster;
+            Boolean.TryParse(offRoster, out isOffRoster);
             DateTime date = DateTime.Now;
-            StaffingRoster roster = getStaffingForDate(date, station);
+            StaffingRoster roster = getStaffingForDate(date, station, isOffRoster);
             ApiWrapper response = new ApiWrapper{ Data = roster }; 
             return JsonConvert.SerializeObject(response);
         }
@@ -477,12 +523,14 @@ namespace Dievas.Controllers {
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <returns> JSON formated string representation of the staffing information for the <paramref name="date" /> day</returns>
         [HttpGet("staffing/{date}")]
-        public string GetRosterByDate(string date, [FromQuery] string station) {
+        public string GetRosterByDate(string date, [FromQuery] string station, [FromQuery] string offRoster) {
+            bool isOffRoster;
+            Boolean.TryParse(offRoster, out isOffRoster);
             ApiWrapper response = new ApiWrapper();
 
             try {
                 DateTime dt = DateTime.ParseExact(date, "yyyyMMdd", null);
-                response.Data = getStaffingForDate(dt, station);
+                response.Data = getStaffingForDate(dt, station, isOffRoster);
                 return JsonConvert.SerializeObject(response);
             } catch (FormatException) {
                 response.Data = new {Error = $"The date provided, {date}, does not appear to be in the format \"yyyyMMdd\"."};
