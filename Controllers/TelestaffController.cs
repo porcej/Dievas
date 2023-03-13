@@ -337,24 +337,35 @@ namespace Dievas.Controllers {
                     PersonSchedule thisSchedule = personSchedule.PersonSchedule.Find(
                         t => $"{t.StartDate.ToString("yyyyMMdd", null)}{t.StartTime.ToString("HHmm", null)}" == record.StartTime.ToString("yyyyMMddHHmm"));
 
-                    if (thisSchedule != null){
-                        record.InstitutionName = thisSchedule.Organization.Institution.Name ?? "";
-                        record.AgencyName = thisSchedule.Organization.Agency.Name ?? "";
-                        record.RegionName = thisSchedule.Organization.Region.Name ?? "";
-                        record.ShiftName = thisSchedule.Shift.Name ?? "";
-                        record.StationName = thisSchedule.Organization.Station.Name ?? "";
-                        record.WorkCode = thisSchedule.WorkCode.Name ?? "";
-                        record.IsWorking = TS.IsWorkingCodeType(thisSchedule.WorkCode.Type);
+                    if (thisSchedule != null) {
+                        if (thisSchedule.Shift != null) 
+                            record.ShiftName = thisSchedule.Shift.Name ?? "";
 
-                        if (thisSchedule.Organization.Position != null ) {
-                            record.Id = thisSchedule.Organization.Position.Id;
-                            record.Title = thisSchedule.Organization.Position.Name;
-                            record.PositionDisplayName = thisSchedule.Organization.Position.DisplayName;
-                        } else {
-                            // This person is not assigned to a known position
-                            record.Id = 0;
-                            record.Title = "";
-                            record.PositionDisplayName = "";
+                        if (thisSchedule.WorkCode != null) {
+                            record.WorkCode = thisSchedule.WorkCode.Name ?? "";
+                            record.IsWorking = TS.IsWorkingCodeType(thisSchedule.WorkCode.Type);
+                        }
+                        if (thisSchedule.Organization != null) {
+                            record.InstitutionName = thisSchedule.Organization.Institution.Name ?? "";
+                            if (thisSchedule.Organization.Agency != null) {
+                                record.AgencyName = thisSchedule.Organization.Agency.Name ?? "";
+                                record.RegionName = thisSchedule.Organization.Region.Name ?? "";
+                            }
+                            if (thisSchedule.Organization.Station != null) {
+                                record.StationName = thisSchedule.Organization.Station.Name ?? "";
+                            } else {
+                                record.StationName = "";
+                            }
+                            if (thisSchedule.Organization.Position != null ) {
+                                record.Id = thisSchedule.Organization.Position.Id;
+                                record.Title = thisSchedule.Organization.Position.Name;
+                                record.PositionDisplayName = thisSchedule.Organization.Position.DisplayName;
+                            } else {
+                                // This person is not assigned to a known position
+                                record.Id = 0;
+                                record.Title = "";
+                                record.PositionDisplayName = "";
+                            }
                         }
                     } else {
                         record.Id = -2;
