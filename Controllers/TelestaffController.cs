@@ -20,6 +20,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
+
+using AFD.Dashboard.Models;
+
 using System.ComponentModel;
 
 namespace Dievas.Controllers {
@@ -52,16 +55,24 @@ namespace Dievas.Controllers {
         ///     Holds roster data keyed by date
         /// </summary>
         private static readonly ConcurrentDictionary<DateTime, StaffingCache> _rosters = new ConcurrentDictionary<DateTime, StaffingCache>();
+
+        /// <summary>
+        ///     Holds a reference to the CAD state as maintained in a Singelton
+        /// </summary>
+        private static CAD _cad;
         
         /// <summary>
         ///     Default constructor for Class <c>TelestaffController</c>
         /// </summary>
         /// <param name="configuration">IConfiguration configuration informaiton</param>
         /// <param name="logger">ILogger: aggregate logger</param>
+        /// <param name="cad">CAD: Singleton Representing state from a CAD</param>
         public TelestaffController(IConfiguration configuration,
-                                        ILogger<TelestaffController> logger) {
+                                   ILogger<TelestaffController> logger,
+                                   CAD cad) {
             _config = configuration;
             _logger = logger;
+            _cad = cad;
 
             HttpClientHandler httpClientHandler = new HttpClientHandler();
 
@@ -85,6 +96,7 @@ namespace Dievas.Controllers {
             var byteArray = Encoding.ASCII.GetBytes($"{_config["Telestaff:Username"]}:{_config["Telestaff:Password"]}");
             _http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
         }
+
 
         /// <summary>
         ///     Fetches Information from Telestaff's API and returns it as a JSON string
@@ -381,7 +393,51 @@ namespace Dievas.Controllers {
             };
         }
 
-        private StaffingRoster getStaffingForDate(DateTime date){
+
+        private string delMe(){
+            // var baseAddress = _http.BaseAddress;
+            string endpoint  = "https://sfireweb2.alexgov.net/DashboardApi/api/Dashboard/units";
+            HttpResponseMessage result = _http.GetAsync(endpoint).Result;
+
+                return result.Content.ReadAsStringAsync().Result;
+
+        }
+
+        /// <summary>
+        ///     Filters roster records by station
+        /// </summary>
+        /// <param name="roster">StaffingRoster holding data to be filtered</param>
+        /// <param name="station">String representing a station</param>
+        private StaffingRoster filterRosterByStation(StaffingRoster roster, string station = "") {
+            // if (string.IsNullOrWhiteSpace(station)) return roster;
+
+            station = "201";
+
+
+            // List<UnitDto> testMaybe = JsonConvert.DeserializeObject<List<UnitDto>>(delMe());
+
+
+
+
+
+            // _cad.PopulateUnitList(testMaybe );
+
+            // Get the units assigned to the station from CAD
+            List<string> homedUnits = _cad.GetUnits()
+                                          .Where(unit => unit.HomeJurisdiction == station)
+                                          .Select(unit => unit.RadioName)
+                                          .ToList();
+
+            roster.Records = roster.Records.FindAll(record => homedUnits.Contains(record.UnitName) || (record.StationName != null && record.StationName.Contains(station)));
+            return roster;
+        }
+
+        /// <summary>
+        ///     Returns staffing data and fetches new staffing data if needed
+        /// </summary>
+        /// <param name="date">string Representing the date to fetch a roster for</param>
+        /// <param name="station">Station information to filter the roster records on</param>
+        private StaffingRoster getStaffingForDate(DateTime date, string station = ""){
             DateTime now = DateTime.Now;
 
             // Make sure we have a date and not a date & time to key on
@@ -392,7 +448,7 @@ namespace Dievas.Controllers {
                 
                 // Check if our data is expired
                 if (_rosters[date].IsValid()) {
-                    return _rosters[date].Roster;
+                    return filterRosterByStation(_rosters[date].Roster, station);
                 }
             }
 
@@ -419,7 +475,7 @@ namespace Dievas.Controllers {
                     }
                 }
             );
-            return roster;
+            return filterRosterByStation(roster, station);
         }
 
 
@@ -428,9 +484,9 @@ namespace Dievas.Controllers {
         /// </summary>
         /// <returns> JSON formated string representation of the staffing information for the current calendar day</returns>
         [HttpGet("staffing")]
-        public string GetStaffing() {
+        public string GetStaffing([FromQuery] string station) {
             DateTime date = DateTime.Now;
-            StaffingRoster roster = getStaffingForDate(date);
+            StaffingRoster roster = getStaffingForDate(date, station);
             ApiWrapper response = new ApiWrapper{ Data = roster }; 
             return JsonConvert.SerializeObject(response);
         }
@@ -441,12 +497,12 @@ namespace Dievas.Controllers {
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <returns> JSON formated string representation of the staffing information for the <paramref name="date" /> day</returns>
         [HttpGet("staffing/{date}")]
-        public string GetRosterByDate(string date) {
+        public string GetRosterByDate(string date, [FromQuery] string station) {
             ApiWrapper response = new ApiWrapper();
 
             try {
                 DateTime dt = DateTime.ParseExact(date, "yyyyMMdd", null);
-                response.Data = getStaffingForDate(dt);
+                response.Data = getStaffingForDate(dt, station);
                 return JsonConvert.SerializeObject(response);
             } catch (FormatException) {
                 response.Data = new {Error = $"The date provided, {date}, does not appear to be in the format \"yyyyMMdd\"."};
