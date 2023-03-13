@@ -394,33 +394,13 @@ namespace Dievas.Controllers {
         }
 
 
-        private string delMe(){
-            // var baseAddress = _http.BaseAddress;
-            string endpoint  = "https://sfireweb2.alexgov.net/DashboardApi/api/Dashboard/units";
-            HttpResponseMessage result = _http.GetAsync(endpoint).Result;
-
-                return result.Content.ReadAsStringAsync().Result;
-
-        }
-
         /// <summary>
         ///     Filters roster records by station
         /// </summary>
         /// <param name="roster">StaffingRoster holding data to be filtered</param>
         /// <param name="station">String representing a station</param>
         private StaffingRoster filterRosterByStation(StaffingRoster roster, string station = "") {
-            // if (string.IsNullOrWhiteSpace(station)) return roster;
-
-            station = "201";
-
-
-            // List<UnitDto> testMaybe = JsonConvert.DeserializeObject<List<UnitDto>>(delMe());
-
-
-
-
-
-            // _cad.PopulateUnitList(testMaybe );
+            if (string.IsNullOrWhiteSpace(station)) return roster;
 
             // Get the units assigned to the station from CAD
             List<string> homedUnits = _cad.GetUnits()
