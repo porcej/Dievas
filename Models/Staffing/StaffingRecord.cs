@@ -17,6 +17,7 @@ namespace Dievas.Models.Staffing {
 	    	RegionNotes = rr.RegionDispatchAttachCh ?? "";
 	    	ShiftNotes = rr.ShiftDispatchAttachCh ?? "";
 	    	StationNotes = rr.StationDispatchAttachCh ?? "";
+	    	StationAbbreviation = rr.StationAbrvCh ?? "";
 	    	UnitAbbreviation = rr.PhysicalUnitAbrvCh ?? "";
 	    	UnitName = rr.PhysicalUnitNameCh ?? "";
 	    	UnitNotes = rr.PunitDispatchAttachCh ?? "";
@@ -100,6 +101,12 @@ namespace Dievas.Models.Staffing {
 	    ///	</summary>
 	    [JsonProperty("stationNotes")]
 	    public string StationNotes { get; set; }
+
+	    /// <summary>
+	    /// 	Station Abbreviation
+	    ///	</summary>
+	    [JsonProperty("stationAbbreviation")]
+	    public string StationAbbreviation { get; set; }
 
 	    /// <summary>
 	    /// 	Unit Name
