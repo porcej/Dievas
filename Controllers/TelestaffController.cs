@@ -73,8 +73,12 @@ namespace Dievas.Controllers {
 
             HttpClientHandler httpClientHandler = new HttpClientHandler();
 
+            bool allowInvalidCertificates = false;
+
+            Boolean.TryParse(_config["Telestaff:AllowInvalidCertificates"], out allowInvalidCertificates);
+
             // If our settings allow us, skip ceritifcate validation
-            if (_config["Telestaff:AllowInvalidCertificates"] == "True") {
+            if (allowInvalidCertificates) {
                 httpClientHandler.ServerCertificateCustomValidationCallback = 
                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
             }
