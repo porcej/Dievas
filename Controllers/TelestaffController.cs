@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using AFD.Dashboard.Models;
 using Dievas.Models;
 using Dievas.Models.Telestaff;
 using Dievas.Models.Staffing;
@@ -21,16 +23,11 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
 
-using AFD.Dashboard.Models;
-
-using System.ComponentModel;
-
 namespace Dievas.Controllers {
 
     /// <summary>
     ///     Controller Class <c>TelestaffController</c> Provided an API to access staffing information
     ///     
-    ///     TODO: UPDATE Handling roster records with request = true
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
@@ -95,30 +92,7 @@ namespace Dievas.Controllers {
             // Handle user authentication for all requests
             var byteArray = Encoding.ASCII.GetBytes($"{_config["Telestaff:Username"]}:{_config["Telestaff:Password"]}");
             _http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-
-
-
-        /// ****************************************************************************************
-        /// *  TEST HARNESS NOT FOR PRODUCTION
-            List<UnitDto> testUnits = JsonConvert.DeserializeObject<List<UnitDto>>(populateTestUnits());
-            _cad.PopulateUnitList(testUnits);
-        /// * END TEST HARNESS
-        /// ****************************************************************************************
         }
-
-
-        /// ****************************************************************************************
-        /// *  TEST METHOD NOT FOR PRODUCTION
-        private string populateTestUnits(){
-            // var baseAddress = _http.BaseAddress;
-            string endpoint  = "https://sfireweb2.alexgov.net/DashboardApi/api/Dashboard/units";
-            HttpResponseMessage result = _http.GetAsync(endpoint).Result;
-
-                return result.Content.ReadAsStringAsync().Result;
-
-        }
-        /// * END TEST METHOD
-        /// ****************************************************************************************
 
 
         /// <summary>
@@ -429,15 +403,6 @@ namespace Dievas.Controllers {
                                           .Select(unit => unit.RadioName)
                                           .ToList();
 
-
-            Console.WriteLine("===============================================");
-            Console.WriteLine($"==== {station} ====");
-            Console.WriteLine("===============================================");
-            Console.WriteLine("Homed Units: ");
-            Console.WriteLine(JsonConvert.SerializeObject(homedUnits));
-            // Console.WriteLine("================================================");
-            // Console.WriteLine("================================================");
-            // Console.WriteLine(JsonConvert.SerializeObject(roster));
             List<StaffingRecord> records = roster.Records.FindAll(record => 
                             homedUnits.Contains(record.UnitName) || homedUnits.Contains(record.UnitAbbreviation)
                             || (record.StationName != null && record.StationName.Contains(station))
@@ -447,11 +412,6 @@ namespace Dievas.Controllers {
                 records = records.FindAll(record => record.IsWorking && !record.IsRequest && record.UnitName != "{off roster}");
             }
 
-            // roster.Records = roster.Records.FindAll(record => homedUnits.Contains(record.UnitName) || (record.StationName != null && record.StationName.Contains(station)));
-
-            // Console.WriteLine(JsonConvert.SerializeObject(roster));
-            // Console.WriteLine("================================================");
-            // Console.WriteLine("================================================");
             return new StaffingRoster(roster.RosterDate, records);
         }
 
