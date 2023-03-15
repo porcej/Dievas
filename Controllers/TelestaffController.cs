@@ -398,8 +398,11 @@ namespace Dievas.Controllers {
         /// <param name="roster">StaffingRoster holding data to be filtered</param>
         /// <param name="station">String representing a station</param>
         /// <param name="offRoster">Boolean iff includes off roster records</param>
-        private StaffingRoster filterRosterByStation(StaffingRoster roster, string station = "", bool offRoster = false) {
+        /// <param name="telestaffOnly">Boolean iff excludes matching on CAD.</param>
+        private StaffingRoster filterRosterByStation(StaffingRoster roster, string station = "", bool offRoster = false, bool telestaffOnly = false) {
             if (string.IsNullOrWhiteSpace(station)) return roster;
+
+            _logger.LogInformation($"Filtering staffing records for station {station} where offRoster={offRoster.ToString()} and telestaffOnly={telestaffOnly.ToString()}.");
 
             // Get the units assigned to the station from CAD
             List<string> homedUnits = _cad.GetUnits()
@@ -408,7 +411,8 @@ namespace Dievas.Controllers {
                                           .ToList();
 
             List<StaffingRecord> records = roster.Records.FindAll(record => 
-                            homedUnits.Contains(record.UnitName) || homedUnits.Contains(record.UnitAbbreviation)
+                            (!telestaffOnly && homedUnits.Contains(record.UnitName))
+                            || (!telestaffOnly && homedUnits.Contains(record.UnitAbbreviation))
                             || (record.StationName != null && record.StationName.Contains(station))
                             || (record.StationAbbreviation != null && record.StationAbbreviation.Contains(station)));
 
@@ -425,7 +429,7 @@ namespace Dievas.Controllers {
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <param name="station">Station information to filter the roster records on</param>
         /// <param name="offRoster">Boolean iff includes off roster records</param>
-        private StaffingRoster getStaffingForDate(DateTime date, string station = "", bool offRoster = false) {
+        private StaffingRoster getStaffingForDate(DateTime date, string station = "", bool offRoster = false, bool telestaffOnly = false) {
             DateTime now = DateTime.Now;
 
             // Make sure we have a date and not a date & time to key on
@@ -436,7 +440,7 @@ namespace Dievas.Controllers {
                 
                 // Check if our data is expired
                 if (_rosters[date].IsValid()) {
-                    return filterRosterByStation(_rosters[date].Roster, station, offRoster);
+                    return filterRosterByStation(_rosters[date].Roster, station, offRoster, telestaffOnly);
                 }
             }
 
@@ -463,7 +467,7 @@ namespace Dievas.Controllers {
                     }
                 }
             );
-            return filterRosterByStation(roster, station, offRoster);
+            return filterRosterByStation(roster, station, offRoster, telestaffOnly);
         }
 
 
@@ -472,11 +476,13 @@ namespace Dievas.Controllers {
         /// </summary>
         /// <returns> JSON formated string representation of the staffing information for the current calendar day</returns>
         [HttpGet("staffing")]
-        public string GetStaffing([FromQuery] string station, [FromQuery] string offRoster) {
+        public string GetStaffing([FromQuery] string station, [FromQuery] string offRoster, [FromQuery] string telestaffOnly) {
             bool isOffRoster;
             Boolean.TryParse(offRoster, out isOffRoster);
+            bool isTelestaffOnly;
+            Boolean.TryParse(telestaffOnly, out isTelestaffOnly);
             DateTime date = DateTime.Now;
-            StaffingRoster roster = getStaffingForDate(date, station, isOffRoster);
+            StaffingRoster roster = getStaffingForDate(date, station, isOffRoster, isTelestaffOnly);
             ApiWrapper response = new ApiWrapper{ Data = roster }; 
             return JsonConvert.SerializeObject(response);
         }
@@ -487,14 +493,16 @@ namespace Dievas.Controllers {
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <returns> JSON formated string representation of the staffing information for the <paramref name="date" /> day</returns>
         [HttpGet("staffing/{date}")]
-        public string GetRosterByDate(string date, [FromQuery] string station, [FromQuery] string offRoster) {
+        public string GetRosterByDate(string date, [FromQuery] string station, [FromQuery] string offRoster, [FromQuery] string telestaffOnly) {
             bool isOffRoster;
             Boolean.TryParse(offRoster, out isOffRoster);
+            bool isTelestaffOnly;
+            Boolean.TryParse(telestaffOnly, out isTelestaffOnly);
             ApiWrapper response = new ApiWrapper();
 
             try {
                 DateTime dt = DateTime.ParseExact(date, "yyyyMMdd", null);
-                response.Data = getStaffingForDate(dt, station, isOffRoster);
+                response.Data = getStaffingForDate(dt, station, isOffRoster, isTelestaffOnly);
                 return JsonConvert.SerializeObject(response);
             } catch (FormatException) {
                 response.Data = new {Error = $"The date provided, {date}, does not appear to be in the format \"yyyyMMdd\"."};
