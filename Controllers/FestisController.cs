@@ -15,14 +15,14 @@ namespace Dievas.Controllers {
 
     [ApiController]
     [Route("api/[controller]")]
-    public class TelestaffProxyController : ControllerBase {
+    public class FestisController : ControllerBase {
 
         private readonly IConfiguration _config;
 
-        private readonly ILogger<TelestaffProxyController> _logger;
+        private readonly ILogger<FestisController> _logger;
 
-        public TelestaffProxyController(IConfiguration configuration,
-                                        ILogger<TelestaffProxyController> logger) {
+        public FestisController(IConfiguration configuration,
+                                        ILogger<FestisController> logger) {
             _config = configuration;
             _logger = logger;
         }

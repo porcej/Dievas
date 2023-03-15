@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>f459dc32-f0ce-4217-8ce9-790646a38b14</UserSecretsId>
+    <!-- <Nullable>enable</Nullable> -->
+    <!-- <NoWarn>CS8618,CS8604</NoWarn> -->
   </PropertyGroup>
 
   <ItemGroup>
