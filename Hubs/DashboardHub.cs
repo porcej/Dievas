@@ -89,7 +89,7 @@ namespace Dievas.Hubs {
             }
         }
 
-        //Receive all units on initialization
+        // Receive all units on initialization
         public async Task AllUnits(IEnumerable<UnitDto> units)
         {
             _cad.PopulateUnitList(units);
