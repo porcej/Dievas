@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Backend.Models;
+using Dievas.Models;
 
 namespace Dievas.Models {
 
