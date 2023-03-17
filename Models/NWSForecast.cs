@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Backend.Models;
+using Dievas.Models;
 
-namespace Backend.Models {
+namespace Dievas.Models {
 
     public class NWSForecast {
         public DateTime updated{ get; set; }

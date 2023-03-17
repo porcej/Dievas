@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Backend.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using AFD.Dashboard.Models;
@@ -90,7 +89,7 @@ namespace Dievas.Hubs {
             }
         }
 
-        //Receive all units on initialization
+        // Receive all units on initialization
         public async Task AllUnits(IEnumerable<UnitDto> units)
         {
             _cad.PopulateUnitList(units);
