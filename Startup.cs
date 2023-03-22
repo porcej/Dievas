@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Dievas.Hubs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,20 +12,36 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Dievas.Hubs;
 
 namespace Dievas {
 
+    /// <summary>
+    ///     Startup Class <c>Startup</c> Bootstraps Dievas
+    ///     
+    /// </summary>
     public class Startup {
 
+        /// <summary>
+        ///     Application configuration for this Class
+        /// </summary>
+        public IConfiguration Configuration { get; }
+
+        /// <summary>
+        ///     Default constructor for Class <c>Startup/c>
+        /// </summary>
+        /// <param name="configuration">IConfiguration configuration informaiton</param>
         public Startup(IConfiguration configuration) {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add
-        //      services to the container.
+        /// <summary>
+        ///     This method gets called by the runtime. Use this method to add
+        ///     services to the container.
+        /// </summary>
+        /// <param name="services">IServiceCollection Application Servies List</param>
         public void ConfigureServices(IServiceCollection services) {
             services.AddControllers();
             services.AddSwaggerGen(c => {
@@ -36,10 +53,27 @@ namespace Dievas {
             services.AddSignalR();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<CAD>();
+
+            //JWT Authentication
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options => {
+                options.TokenValidationParameters = new TokenValidationParameters {
+                    ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                };
+            });
         }
 
-        // This method gets called by the runtime. Use this method to configure
-        //  the HTTP request pipeline.
+        /// <summary>
+        ///     This method gets called by the runtime. Use this method to configure
+        ///     the HTTP request pipeline.
+        /// </summary>
+        /// <param name="app">IApplicationBuilder factory to create this app</param>
+        /// <param name="env">IWebHostEnvironment web host configuration</param>
         public void Configure(IApplicationBuilder app, 
                               IWebHostEnvironment env) {
             
@@ -68,11 +102,9 @@ namespace Dievas {
             );
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
                 endpoints.MapHub<DashboardHub>("/dashboardHub");
