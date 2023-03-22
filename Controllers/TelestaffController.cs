@@ -22,7 +22,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
-
 namespace Dievas.Controllers {
 
     /// <summary>
