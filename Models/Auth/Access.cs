@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Dievas.Models.Auth;
 
 namespace Dievas.Models.Auth
