@@ -14,7 +14,8 @@ Clone this respository and use [.NET CLI](https://docs.microsoft.com/en-us/dotne
 ```bash
 $ git clone [git@github.com:porcej/Dievas.git](https://github.com/porcej/Dievas.git)
 $ cd Dievas
-$ dotnet add package Newtonsoft.Json
+$ github
+$ dotnet restore
 ```
 
 ## Usage
