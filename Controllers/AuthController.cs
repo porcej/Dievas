@@ -124,13 +124,9 @@ namespace Dievas.Controllers {
         /// <param name="ldapUrl">URL for LDAP server including port</param>
         /// <returns>true if the credentials are valid, false otherwise</returns>
         public bool validateUserViaLDAP(string username, string password, string domain, string ldapUrl) {
-
-
             var credentials = new NetworkCredential(username, password, domain);
             var serverId = new LdapDirectoryIdentifier(ldapUrl);
             var connection = new LdapConnection(serverId, credentials);
-
-
             bool result = true;
             try {
                 connection.Bind();
@@ -138,9 +134,7 @@ namespace Dievas.Controllers {
             catch (Exception) {
                 result = false;
             }
-
             connection.Dispose();
-
             return result;
         }
     }
