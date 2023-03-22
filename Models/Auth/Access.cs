@@ -7,7 +7,7 @@ namespace Dievas.Models.Auth
     public class Access
     {
         public static List<UserModel> Users = new() {
-            new UserModel(){ Username="testadmin", Roles= new List<string> {"admin"}}
+            new UserModel(){ Username="joseph.porcelli", Roles= new List<string> {"admin"}}
         };
     }
 }
