@@ -107,7 +107,7 @@ namespace Dievas {
             app.UseAuthorization();
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
-                endpoints.MapHub<DashboardHub>(Configuration["HubEndPoiint"]);
+                endpoints.MapHub<DashboardHub>(Configuration["DashboardHubEndPoint"]);
             });
         }
     }

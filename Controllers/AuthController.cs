@@ -50,7 +50,7 @@ namespace Dievas.Controllers {
         ///     Listen for loggin requests via post
         /// </summary>
         /// <param name="userLogin">UserLogin user information to faciliate login</param>
-        /// <returns> Returns JWT Token is user is authorized and 401 otherwise.</returns>
+        /// <returns> Returns JWT Token if user is authorized and 401 otherwise.</returns>
         [AllowAnonymous]
         [HttpPost]
         public ActionResult Login([FromBody] UserLogin userLogin) {
