@@ -61,7 +61,7 @@ namespace Dievas.Controllers {
                 return Ok(token);
             }
             _logger.LogInformation($"Failed autentication using uername {userLogin.Username} at {DateTime.Now.ToString()}");
-            return Unauthorized();
+            return BadRequest(new { message = "Username or password is incorrect" });
         }
 
         /// <summary>
