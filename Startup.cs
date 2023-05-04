@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Dievas.Hubs;
+using Dievas.Models.Auth;
 
 namespace Dievas {
 
@@ -74,19 +75,38 @@ namespace Dievas {
         /// </summary>
         /// <param name="app">IApplicationBuilder factory to create this app</param>
         /// <param name="env">IWebHostEnvironment web host configuration</param>
+        /// <param name="logger">Iloggger logging configuration</param> 
         public void Configure(IApplicationBuilder app, 
-                              IWebHostEnvironment env) {
+                              IWebHostEnvironment env,
+                              ILogger<Startup> logger) {
             
             string _appDescription = Configuration["AppName"] + 
                                      " v" + 
                                      Configuration["Version"];
 
             if (env.IsDevelopment()) {
+                logger.LogInformation("Using development pipeline.");
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => 
                     c.SwaggerEndpoint(Configuration["SwaggerEndpoint"],
                                       _appDescription));
+            } else {
+                logger.LogInformation("Using production pipeline.");
+            }
+
+
+            // Load default user if one is specified in the configuration
+            UserModel _defaultUser = new UserModel() { 
+                Username = Configuration["DefaultUser:Username"],
+                Roles = Configuration["DefaultUser:Roles"].Split(";").ToList()
+            };
+
+            if (Access.Users.Contains(_defaultUser)) {
+                logger.LogInformation($"Default user {_defaultUser.Username} already exists.");
+            } else {
+                Access.Users.Add(_defaultUser);
+                logger.LogInformation($"Adding user {_defaultUser.Username} with roles: {Configuration["DefaultUser:Roles"]}.");
             }
 
             // Split the Origins string by semi-colin to allow multiple origins
