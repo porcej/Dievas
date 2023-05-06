@@ -10,7 +10,6 @@ namespace Dievas.Models.Auth {
         /// </summary>
         public string Username { get; set; }
 
-
         /// <summary>
         ///     Password
         /// </summary>

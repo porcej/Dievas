@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Dievas.Models.Auth;
+
 namespace Dievas.Models.Auth {
 
     /// <summary>
@@ -16,10 +19,25 @@ namespace Dievas.Models.Auth {
         public string Token { get; set; }
 
         /// <summary>
+        ///     Roles assigned to user
+        /// </summary>
+        public List<string> Roles { get; set; }
+
+        /// <summary>
         ///     Default Constructor
         /// </summary>
-        public AuthenticateResponse(string username, string token) {
+        public AuthenticateResponse(string username, List<string> roles, string token) {
             Username = username;
+            Roles = roles;
+            Token = token;
+        }
+
+        /// <summary>
+        ///     UserModel constructor
+        /// </summary>
+        public AuthenticateResponse(UserModel user, string token) {
+            Username = user.Username;
+            Roles = user.Roles;
             Token = token;
         }
     }
