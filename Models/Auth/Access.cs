@@ -12,5 +12,10 @@ namespace Dievas.Models.Auth {
         ///     List of user's and their access level
         /// </summary>
         public static List<UserModel> Users = new List<UserModel>();
+
+        /// <summary>
+        ///     Roles assigned to user
+        /// </summary>
+        public static List<string> Roles = new List<string> { "admin", "messenger", "user" };
     }
 }
