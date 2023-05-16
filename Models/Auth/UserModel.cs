@@ -19,7 +19,7 @@ namespace Dievas.Models.Auth {
         public List<string> Roles { get; set; }
 
         /// <summary>
-        ///     Username for user
+        ///     Checks for equality
         /// </summary>
         /// <returns> Returns true, iff the compared to a UserModel object with the same username.  Returns false otherwise</returns>
         public override bool Equals(Object obj) {
