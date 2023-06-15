@@ -57,7 +57,6 @@ namespace Dievas.Hubs {
                                               incidentId.ToString());
         }
 
-
         // ***************************************************************************************\
         // ***************************************************************************************/
         // Please have datafeeds run JoinDataFeed() on connection 
@@ -90,8 +89,7 @@ namespace Dievas.Hubs {
         }
 
         // Receive all units on initialization
-        public async Task AllUnits(IEnumerable<UnitDto> units)
-        {
+        public void AllUnits(IEnumerable<UnitDto> units) {
             _cad.PopulateUnitList(units);
         }
 
