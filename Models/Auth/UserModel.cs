@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Dievas.Models.Auth;
 
 namespace Dievas.Models.Auth {
 
     /// <summary>
     ///     Class <c>UserModel</c> Model for a user of this application
     /// </summary>
+    [PrimaryKey(nameof(Username))]
     public class UserModel {
 
         /// <summary>
@@ -14,9 +17,35 @@ namespace Dievas.Models.Auth {
         public string Username { get; set; }
 
         /// <summary>
-        ///     Roles assigned to user
+        ///     Roles assigned to user, seperated by ";"
         /// </summary>
+        // public string Roles { get; set; }
         public List<string> Roles { get; set; }
+
+        /// <summary>
+        ///     Adds a list of roles
+        /// </summary>
+        /// <param name="newRoles">List\<string\> list of roles</param>
+        public void AddRolesFromList(List<string> newRoles) {
+            Console.WriteLine(newRoles);
+        }
+            
+        /// <summary>
+        ///     Adds a single role
+        /// </summary>
+        /// <param name="newRole">string: role to add</param>
+        public void AddRole(string newRole) {
+            Roles.Add(newRole);
+        }
+
+        /// <summary>
+        ///     Copies properties
+        /// </summary>
+        /// <param name="model">UserModel: Model of which to copy</param>
+        public void copy(UserModel model) {
+            Username = model.Username;
+            Roles = model.Roles;
+        }
 
         /// <summary>
         ///     Checks for equality

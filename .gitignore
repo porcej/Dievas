@@ -196,3 +196,8 @@ $RECYCLE.BIN/
 .vscode/launch.json
 .gitignore
 .vscode/tasks.json
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal

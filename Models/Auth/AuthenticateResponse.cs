@@ -21,7 +21,7 @@ namespace Dievas.Models.Auth {
         /// <summary>
         ///     Roles assigned to user
         /// </summary>
-        public List<string> Roles { get; set; }
+        public List<string> Roles = new List<string>();
 
         /// <summary>
         ///     Default Constructor

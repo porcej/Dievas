@@ -16,6 +16,6 @@ namespace Dievas.Models.Auth {
         /// <summary>
         ///     Roles assigned to user
         /// </summary>
-        public static List<string> Roles = new List<string> { "admin", "messenger", "user" };
+        public static List<string> Roles;
     }
 }

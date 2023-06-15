@@ -8,13 +8,16 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Dievas.Data;
 using Dievas.Hubs;
+using Dievas.Models;
 using Dievas.Models.Auth;
 
 namespace Dievas {
@@ -44,6 +47,8 @@ namespace Dievas {
         /// </summary>
         /// <param name="services">IServiceCollection Application Servies List</param>
         public void ConfigureServices(IServiceCollection services) {
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlite(Configuration.GetConnectionString("DBConnection")));
             services.AddControllers();
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1", new OpenApiInfo { 
@@ -93,20 +98,6 @@ namespace Dievas {
                                       _appDescription));
             } else {
                 logger.LogInformation("Using production pipeline.");
-            }
-
-
-            // Load default user if one is specified in the configuration
-            UserModel _defaultUser = new UserModel() { 
-                Username = Configuration["DefaultUser:Username"],
-                Roles = Configuration["DefaultUser:Roles"].Split(";").ToList()
-            };
-
-            if (Access.Users.Contains(_defaultUser)) {
-                logger.LogInformation($"Default user {_defaultUser.Username} already exists.");
-            } else {
-                Access.Users.Add(_defaultUser);
-                logger.LogInformation($"Adding user {_defaultUser.Username} with roles: {Configuration["DefaultUser:Roles"]}.");
             }
 
             // Split the Origins string by semi-colin to allow multiple origins

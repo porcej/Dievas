@@ -1,18 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
+using System.DirectoryServices.AccountManagement;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Dievas.Models.Auth;
+using Dievas.Data;
 
 namespace Dievas.Controllers {
 
@@ -36,14 +40,21 @@ namespace Dievas.Controllers {
         private readonly ILogger<AuthController> _logger;
 
         /// <summary>
+        ///     Database Access Object
+        /// </summary>
+        private AppDbContext _appDbContext;
+
+        /// <summary>
         ///     Default constructor for Class <c>AuthController</c>
         /// </summary>
         /// <param name="configuration">IConfiguration configuration informaiton</param>
         /// <param name="logger">ILogger: aggregate logger</param>
         public AuthController(IConfiguration configuration,
-                              ILogger<AuthController> logger) {
+                              ILogger<AuthController> logger,
+                              AppDbContext appDbContext) {
             _config = configuration;
             _logger = logger;
+            _appDbContext = appDbContext;
         }
 
         /// <summary>
@@ -53,8 +64,8 @@ namespace Dievas.Controllers {
         /// <returns> Returns JWT Token if user is authorized and 400 otherwise.</returns>
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult Login([FromBody] UserLogin userLogin) {
-            var user = Authenticate(userLogin);
+        public async Task<ActionResult> Login([FromBody] UserLogin userLogin) {
+            var user = await Authenticate(userLogin);
             if (user != null) {
                 _logger.LogInformation($"User {userLogin.Username} authenticated at {DateTime.Now.ToString()}");
                 var token = GenerateToken(user);
@@ -92,7 +103,7 @@ namespace Dievas.Controllers {
         /// </summary>
         /// <param name="userLogin">UserLogin user information to faciliate authentication</param>
         /// <returns> Returns a UserModel for userLogin if authenticated, null otherwise.</returns>
-        private UserModel Authenticate(UserLogin userLogin) {
+        private async Task<UserModel> Authenticate(UserLogin userLogin) {
             bool isValid = false; 
 
             string domain = _config["Auth:Domain"];
@@ -101,13 +112,33 @@ namespace Dievas.Controllers {
             isValid = validateUserViaLDAP(userLogin.Username, userLogin.Password, domain, ldapUrl);
 
             if (isValid) {
-                UserModel user = Access.Users.FirstOrDefault(x => x.Username == userLogin.Username);
+                List<string> roles = new List<string>();
+
+                // Check if user is admin
+                if (isMemberOfGroup(userLogin.Username, _config["Auth:UserGroups:Admins"], domain))
+                    roles.Add("admin");
+
+                // Check if user is an author
+                if (isMemberOfGroup(userLogin.Username, _config["Auth:UserGroups:Authors"], domain))
+                    roles.Add("author");
+
+                // Check if user is an author
+                if (isMemberOfGroup(userLogin.Username, _config["Auth:UserGroups:Approvers"], domain))
+                    roles.Add("approver");
+
+                UserModel user = await _appDbContext.Users.FindAsync(userLogin.Username);
+                // UserModel user = Access.Users.FirstOrDefault(x => x.Username == userLogin.Username);
                 if (user == null) {
                     user = new UserModel {
                         Username = userLogin.Username,
-                        Roles = new List<string> {"user"}
+                        Roles = roles
                     };
+                    await _appDbContext.Users.AddAsync(user);
+                    _logger.LogInformation($"Adding new user {user.Username}.");
+                } else {
+                    user.Roles = roles;
                 }
+                await _appDbContext.SaveChangesAsync();
                 return user;
             }
             return null;
@@ -136,6 +167,33 @@ namespace Dievas.Controllers {
             }
             connection.Dispose();
             return result;
+        }
+
+        /// <summary>
+        /// Attempts to check if the username is a member of group in domain
+        /// </summary>
+        /// <param name="username">String: Username</param>
+        /// <param name="group">String: Group name to check</param>
+        /// <param name="domain">String: Domain</param>
+        /// <returns>true iff the user is a member of group, false otherwise</returns>
+        private bool isMemberOfGroup(string username, string group, string domain) {
+            // AD Access is only available if AD is on the local machine
+            if (OperatingSystem.IsWindows()) {
+                // set up domain context
+                PrincipalContext ctx = new PrincipalContext(ContextType.Domain, domain);
+
+                // find a user
+                UserPrincipal user = UserPrincipal.FindByIdentity(ctx, username);
+
+                // find the group in question
+                GroupPrincipal pGroup = GroupPrincipal.FindByIdentity(ctx, group);
+
+                if (user != null) {
+                   // check if user is member of that group
+                   return user.IsMemberOf(pGroup);
+                }
+            }
+            return false;
         }
     }
 }
