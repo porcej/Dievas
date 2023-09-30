@@ -26,7 +26,7 @@ namespace Dievas.Controllers {
 
         private readonly ILogger<IconController> _logger;
 
-        public DashboardController(IConfiguration configuration,
+        public IconController(IConfiguration configuration,
                                    ILogger<IconController> logger) {
 
             _config = configuration;
@@ -34,10 +34,10 @@ namespace Dievas.Controllers {
         }
 
         // Readonly web API for incidents information
-        [HttpGet("marker/{callType}")]
-        public IActionResult GetIncidents(string callType) {
-            FileStream stream = File.Open(@"")
-            return _cad.GetIncidents();
-        }
+        // [HttpGet("marker/{callType}")]
+        // public IActionResult GetIncidents(string callType) {
+        //     // FileStream stream = File.Open(@"")
+        //     // return _cad.GetIncidents();
+        // }
     }
 }
