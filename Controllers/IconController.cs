@@ -36,7 +36,7 @@ namespace Dievas.Controllers {
         // Readonly web API for incidents information
         [HttpGet("marker/{callType}")]
         public IActionResult GetIncidents(string callType) {
-            FileStream stream = File.Open(@"")
+            FileStream stream = File.Open(@"");
             return _cad.GetIncidents();
         }
     }
