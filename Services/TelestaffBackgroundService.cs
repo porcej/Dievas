@@ -92,8 +92,8 @@ namespace Dievas.Services {
             _http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
             // Read interval from appsettings.json, defaulting to default interval if not provided
-            int intervalMinutes = _config.GetValue<int>("NWS:UpdateIntervalMinutes", DefaultUpdateIntervalMinutes);
-            _logger.LogInformation($"Weather update interval set to {intervalMinutes} minutes.");
+            int intervalMinutes = _config.GetValue<int>("Telestaff:UpdateIntervalMinutes", DefaultUpdateIntervalMinutes);
+            _logger.LogInformation($"Telestaff update interval set to {intervalMinutes} minutes.");
             _updateInterval = TimeSpan.FromMinutes(intervalMinutes);
 
         }
@@ -271,6 +271,7 @@ namespace Dievas.Services {
             }
 
             string opts =  $"{{\"fromDate\":\"{startDate}\",\"thruDate\":\"{endDate}\",\"includeRequestRecords\": true}}";
+
 
             _logger.LogInformation($"Fetching Roster from {opts}.");
             string rosterData = fetchString(TS.RosterEndpoint, opts);
