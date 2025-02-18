@@ -133,24 +133,24 @@ namespace Dievas.Controllers {
         /// </summary>
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <returns> JSON formated string representation of the staffing information for the <paramref name="date" /> day</returns>
-        // [HttpGet("staffing/{date}")]
-        // public string GetRosterByDate(string date, [FromQuery] string station, [FromQuery] string offRoster, [FromQuery] string telestaffOnly) {
-        //     bool isOffRoster;
-        //     Boolean.TryParse(offRoster, out isOffRoster);
-        //     bool isTelestaffOnly;
-        //     Boolean.TryParse(telestaffOnly, out isTelestaffOnly);
-        //     ApiWrapper response = new ApiWrapper();
+        [HttpGet("staffing/{date}")]
+        public string GetRosterByDate(string date, [FromQuery] string station, [FromQuery] string offRoster, [FromQuery] string telestaffOnly) {
+            bool isOffRoster;
+            Boolean.TryParse(offRoster, out isOffRoster);
+            bool isTelestaffOnly;
+            Boolean.TryParse(telestaffOnly, out isTelestaffOnly);
+            ApiWrapper response = new ApiWrapper();
 
-        //     try {
-        //         DateTime dt = DateTime.ParseExact(date, "yyyyMMdd", null);
-        //         response.Data = getStaffingForDate(dt, station, isOffRoster, isTelestaffOnly);
-        //         return JsonConvert.SerializeObject(response);
-        //     } catch (FormatException) {
-        //         response.Data = new {Error = $"The date provided, {date}, does not appear to be in the format \"yyyyMMdd\"."};
-        //         response.StatusCode = 500;
-        //     }
-        //     return JsonConvert.SerializeObject(response);
-        // }
+            try {
+                DateTime dt = DateTime.ParseExact(date, "yyyyMMdd", null);
+                response.Data = getStaffingForDate(dt, station, isOffRoster, isTelestaffOnly);
+                return JsonConvert.SerializeObject(response);
+            } catch (FormatException) {
+                response.Data = new {Error = $"The date provided, {date}, does not appear to be in the format \"yyyyMMdd\"."};
+                response.StatusCode = 500;
+            }
+            return JsonConvert.SerializeObject(response);
+        }
 
         /// <summary>
         ///     API Endpoint for fetching active business units (nodes) from an oranization
