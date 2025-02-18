@@ -272,6 +272,7 @@ namespace Dievas.Services {
 
             string opts =  $"{{\"fromDate\":\"{startDate}\",\"thruDate\":\"{endDate}\",\"includeRequestRecords\": true}}";
 
+
             _logger.LogInformation($"Fetching Roster from {opts}.");
             string rosterData = fetchString(TS.RosterEndpoint, opts);
 
