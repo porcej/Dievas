@@ -25,7 +25,7 @@ namespace Dievas.Services
         public DateTime LastUpdated { get; private set; }
 
         /// <summary>
-        /// Gets the list of weather forecast periods.
+        /// Dictionary containing Staffing Information Keyed on Date
         /// </summary>
         public Dictionary<DateTime, StaffingCache> rosters = new Dictionary<DateTime, StaffingCache>();
 
