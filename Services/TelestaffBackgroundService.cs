@@ -39,7 +39,7 @@ namespace Dievas.Services {
         /// <summary>
         ///     Web Client for this class
         /// </summary>
-        private HttpClient _http;
+        private readonly HttpClient _http;
 
         /// <summary>
         ///     Default update interval value if not specified in appsettings.json
