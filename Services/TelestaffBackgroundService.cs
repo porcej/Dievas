@@ -82,6 +82,14 @@ namespace Dievas.Services {
 
             // Set base address to Telestaff URL
             _http.BaseAddress = new Uri(_config["Telestaff:Url"], UriKind.Absolute);
+
+
+            // Set Cookies if provided
+            string cookies = _config.GetValue<string>("Telestaff:Cookies", "");
+            if (!string.IsNullOrEmpty(cookies)) {
+                _logger.LogInformation("Using cookies for Telestaff requests.")
+                _http.DefaultRequestHeaders.Add("Cookie", cookies);
+            }
             
             // Set our user agent
             var productValue = new ProductInfoHeaderValue(_config["Telestaff:User-agent"]);
@@ -275,6 +283,13 @@ namespace Dievas.Services {
 
             _logger.LogInformation($"Fetching Roster from {opts}.");
             string rosterData = fetchString(TS.RosterEndpoint, opts);
+
+            Console.WriteLine("\n\n\n\n================================================================\n");
+
+            Console.WriteLine(rosterData);
+
+
+            Console.WriteLine("\n================================================================\n\n\n\n");
 
             JObject rosterJsonObj = JObject.Parse(rosterData);
 
