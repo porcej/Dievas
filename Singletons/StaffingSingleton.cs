@@ -51,9 +51,7 @@ namespace Dievas.Services
             date = date.Date;
 
             if (rosters.ContainsKey(date)) {
-                if (rosters[date].IsValid()) {
-                    return rosters[date];
-                }
+                return rosters[date];
             }
             return null;
         }
@@ -61,10 +59,14 @@ namespace Dievas.Services
         /// <summary>
         /// Clean up old Staffing Data
         /// </summary>
-        public void cleanRosters(){
-            var expiredRosters = rosters.Where(r => r.Value.IsExpired()).ToArray();
-            foreach (var expiredRoster in expiredRosters) {
-                rosters.Remove(expiredRoster.Key);
+        public void cleanRosters() {
+            DateTime now = DateTime.Now.Date;
+
+            foreach (datetime date in rosters.Keys) {
+                int timeDelta = DateTime.Compare(now, date);
+                if (timeDelta > 0){
+                    rosters.Remove(data);
+                }
             }
         }
     }
