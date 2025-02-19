@@ -34,12 +34,12 @@ namespace Dievas.Services {
         /// <summary>
         ///     Logging Controller for this class
         /// </summary>
-        private readonly ILogger<TelestaffBackgroundtService> _logger;
+        private readonly ILogger<TelestaffBackgroundService> _logger;
 
         /// <summary>
         ///     Web Client for this class
         /// </summary>
-        private static HttpClient _http;
+        private HttpClient _http;
 
         /// <summary>
         ///     Default update interval value if not specified in appsettings.json
@@ -53,13 +53,13 @@ namespace Dievas.Services {
 
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="TelestaffBackgroundtService"/> class.
+        ///     Initializes a new instance of the <see cref="TelestaffBackgroundService"/> class.
         /// </summary>
         /// <param name="configuration">Configuration instance</param>
         /// <param name="logger">Logger instance</param>
-        public TelestaffBackgroundtService(
+        public TelestaffBackgroundService(
             IConfiguration configuration,
-            ILogger<TelestaffBackgroundtService> logger) {
+            ILogger<TelestaffBackgroundService> logger) {
             
             _config = configuration;
             _logger = logger;
@@ -87,7 +87,7 @@ namespace Dievas.Services {
             // Set Cookies if provided
             string cookies = _config.GetValue<string>("Telestaff:Cookies", "");
             if (!string.IsNullOrEmpty(cookies)) {
-                _logger.LogInformation("Using cookies for Telestaff requests.");
+                _logger.LogInformation("TelestaffBackgroundService: Using cookies for web requests.");
                 _http.DefaultRequestHeaders.Add("Cookie", cookies);
             }
             
@@ -101,7 +101,7 @@ namespace Dievas.Services {
 
             // Read interval from appsettings.json, defaulting to default interval if not provided
             int intervalMinutes = _config.GetValue<int>("Telestaff:UpdateIntervalMinutes", DefaultUpdateIntervalMinutes);
-            _logger.LogInformation($"Telestaff update interval set to {intervalMinutes} minutes.");
+            _logger.LogInformation($"TelestaffBackgroundService: Telestaff update interval set to {intervalMinutes} minutes.");
             _updateInterval = TimeSpan.FromMinutes(intervalMinutes);
 
         }
@@ -125,14 +125,14 @@ namespace Dievas.Services {
             };
 
             try {
-                _logger.LogInformation("Fetching Telestaff Roster...");
+                _logger.LogInformation("TelestaffBackgroundService: Fetching Telestaff Roster...");
                 foreach (DateTime date in dates){
                     StaffingRoster roster = fetchTelestaffRoster(date.ToString(_config["Telestaff:TimeFormat"]));
                     StaffingCache cachedRoster = new StaffingCache(roster, Convert.ToDouble(_config["Telestaff:ExpirationTimeInMinutes"]));
 
                     StaffingSingleton.Instance.addRoster(cachedRoster, date);
                 }
-                _logger.LogInformation("Roster updated from Telestaff successfully.");
+                _logger.LogInformation("TelestaffBackgroundService: Roster updated from Telestaff successfully.");
 
             } catch (Exception ex) {
                 _logger.LogError(ex, "Error fetching roster from Telestaff: {Message}", ex.Message);
@@ -161,7 +161,7 @@ namespace Dievas.Services {
                     "application/json"
                 );
 
-                _logger.LogInformation($"Fetching Telestaff {endpoint} with options {opts}.");
+                _logger.LogInformation($"TelestaffBackgroundService: Fetching Telestaff {endpoint} with options {opts}.");
 
                 HttpResponseMessage result = _http.PostAsync(
                     endpoint,
@@ -281,15 +281,8 @@ namespace Dievas.Services {
             string opts =  $"{{\"fromDate\":\"{startDate}\",\"thruDate\":\"{endDate}\",\"includeRequestRecords\": true}}";
 
 
-            _logger.LogInformation($"Fetching Roster from {opts}.");
+            _logger.LogInformation($"TelestaffBackgroundService: Fetching Roster from {opts}.");
             string rosterData = fetchString(TS.RosterEndpoint, opts);
-
-            Console.WriteLine("\n\n\n\n================================================================\n");
-
-            Console.WriteLine(rosterData);
-
-
-            Console.WriteLine("\n================================================================\n\n\n\n");
 
             JObject rosterJsonObj = JObject.Parse(rosterData);
 
@@ -331,7 +324,7 @@ namespace Dievas.Services {
             List<OrganizationNode> organizations = new List<OrganizationNode>();
             string requestJson = $"{{\"type\": \"{organizationType}\"}}";
             JObject organizationJObject = fetchJObject(TS.OrginizationEndpoint, requestJson);
-            _logger.LogInformation($"Fetching {organizationType} nodes from Telestaff");
+            _logger.LogInformation($"TelestaffBackgroundService: Fetching {organizationType} nodes from Telestaff");
             foreach (JToken organizationJson in organizationJObject["organizationNodes"]) {
                 if (enabled){
                     if( (bool)organizationJson["enabled"]) {
