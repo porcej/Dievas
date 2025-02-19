@@ -23,7 +23,7 @@ namespace Dievas.Services {
     ///     Background Service Class <c>TelestaffBackgroundtService</c> fetches
     ///     staffing data from Telestaff at regular intervals.   
     /// </summary>
-    public class TelestaffBackgroundtService : BackgroundService {
+    public class TelestaffBackgroundService : BackgroundService {
 
 
         /// <summary>

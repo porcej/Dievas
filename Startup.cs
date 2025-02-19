@@ -36,7 +36,7 @@ namespace Dievas {
             });
             services.AddSignalR();
             services.AddHostedService<WeatherForecastBackgroundService>();
-            services.AddHostedService<TelestaffBackgroundtService>();
+            services.AddHostedService<TelestaffBackgroundService>();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<CAD>();
         }
