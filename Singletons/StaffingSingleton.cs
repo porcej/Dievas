@@ -62,10 +62,10 @@ namespace Dievas.Services
         public void cleanRosters() {
             DateTime now = DateTime.Now.Date;
 
-            foreach (datetime date in rosters.Keys) {
+            foreach (DateTime date in rosters.Keys) {
                 int timeDelta = DateTime.Compare(now, date);
                 if (timeDelta > 0){
-                    rosters.Remove(data);
+                    rosters.Remove(date);
                 }
             }
         }
