@@ -87,7 +87,7 @@ namespace Dievas.Services {
             // Set Cookies if provided
             string cookies = _config.GetValue<string>("Telestaff:Cookies", "");
             if (!string.IsNullOrEmpty(cookies)) {
-                _logger.LogInformation("Using cookies for Telestaff requests.")
+                _logger.LogInformation("Using cookies for Telestaff requests.");
                 _http.DefaultRequestHeaders.Add("Cookie", cookies);
             }
             
@@ -135,13 +135,13 @@ namespace Dievas.Services {
                 _logger.LogInformation("Roster updated from Telestaff successfully.");
 
             } catch (Exception ex) {
-                _logger.LogError(ex, "Error fetching roster from Telestaff.");
+                _logger.LogError(ex, "Error fetching roster from Telestaff: {Message}", ex.Message);
             }
 
             try {
                     StaffingSingleton.Instance.cleanRosters();
             }  catch (Exception ex) {
-                _logger.LogError(ex, "Error pruning old Roster information.");
+                _logger.LogError(ex, "Error pruning old rosters from Telestaff: {Message}", ex.Message);
             }
         }
 
