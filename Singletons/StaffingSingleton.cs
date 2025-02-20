@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using Dievas.Models.Staffing;
 
@@ -27,7 +28,7 @@ namespace Dievas.Services
         /// <summary>
         /// Dictionary containing Staffing Information Keyed on Date
         /// </summary>
-        private readonly Dictionary<DateTime, StaffingCache> rosters = new Dictionary<DateTime, StaffingCache>();
+        private readonly ConcurrentDictionary<DateTime, StaffingCache> _rosters = new ConcurrentDictionary<DateTime, StaffingCache>();
 
         /// <summary>
         /// Updates the Staffing Roster data.
@@ -35,7 +36,7 @@ namespace Dievas.Services
         /// <param name="roster">Staffing infomration.</param>
         /// <param name="rosterDate">Date where the Staffing information is valid.</param>
         public void AddRoster(StaffingCache roster, DateTime rosterDate) {
-            rosters.TryAdd(rosterDate, roster);
+            _rosters.TryAdd(rosterDate.Date, roster);
             LastUpdated = DateTime.Now;  // Track last update time
         }
 
@@ -47,11 +48,7 @@ namespace Dievas.Services
             
             // Set the date to the provided rosterDate or current date if null          
             DateTime date = (rosterDate  ?? DateTime.Now).Date;
-
-            if (rosters.ContainsKey(date)) {
-                return rosters[date];
-            }
-            return null;
+            return _rosters.TryGetValue(date, out var roster) ? roster : null;
         }
 
         /// <summary>
@@ -61,7 +58,7 @@ namespace Dievas.Services
             DateTime now = DateTime.Now.Date;
             var keysToRemove = _rosters.Keys.Where(date => date < now).ToList();
             foreach (var date in keysToRemove) {
-                rosters.Remove(date);
+                _rosters.TryRemove(date, out _);
             }
         }
     }
