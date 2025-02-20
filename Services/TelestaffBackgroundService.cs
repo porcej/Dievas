@@ -130,7 +130,7 @@ namespace Dievas.Services {
                     StaffingRoster roster = fetchTelestaffRoster(date.ToString(_config["Telestaff:TimeFormat"]));
                     StaffingCache cachedRoster = new StaffingCache(roster, Convert.ToDouble(_config["Telestaff:ExpirationTimeInMinutes"]));
 
-                    StaffingSingleton.Instance.addRoster(cachedRoster, date);
+                    StaffingSingleton.Instance.AddRoster(cachedRoster, date);
                 }
                 _logger.LogInformation("TelestaffBackgroundService: Roster updated from Telestaff successfully.");
 
@@ -139,7 +139,7 @@ namespace Dievas.Services {
             }
 
             try {
-                    StaffingSingleton.Instance.cleanRosters();
+                    StaffingSingleton.Instance.CleanRosters();
             }  catch (Exception ex) {
                 _logger.LogError(ex, "Error pruning old rosters from Telestaff: {Message}", ex.Message);
             }

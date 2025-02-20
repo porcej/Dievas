@@ -103,7 +103,7 @@ namespace Dievas.Controllers {
         private StaffingRoster getStaffingForDate(DateTime date, string station = "", bool offRoster = false, bool telestaffOnly = false) {
             
             var staffingData = StaffingSingleton.Instance;
-            StaffingCache? staffingRoster = staffingData.getRoster(date);
+            StaffingCache? staffingRoster = staffingData.GetRoster(date);
 
             if (staffingRoster == null) {
                 _logger.LogWarning($"Roster for {date.ToString("MM/dd/yyyy")} not found in cache.");
