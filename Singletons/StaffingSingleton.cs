@@ -54,12 +54,14 @@ namespace Dievas.Services
         /// <summary>
         /// Clean up old Staffing Data
         /// </summary>
-        public void CleanRosters() {
+        /// <returns> List of dates removed from teh cache.</returns>
+        public List<DateTime> CleanRosters() {
             DateTime now = DateTime.Now.Date;
             var keysToRemove = _rosters.Keys.Where(date => date < now).ToList();
             foreach (var date in keysToRemove) {
                 _rosters.TryRemove(date, out _);
             }
+            return keysToRemove;            
         }
     }
 }
