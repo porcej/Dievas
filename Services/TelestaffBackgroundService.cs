@@ -76,13 +76,11 @@ namespace Dievas.Services {
                     HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
             }
 
-
             // Initilize our HttpClient object
             _http = new HttpClient(httpClientHandler);
 
             // Set base address to Telestaff URL
             _http.BaseAddress = new Uri(_config["Telestaff:Url"], UriKind.Absolute);
-
 
             // Set Cookies if provided
             string cookies = _config.GetValue<string>("Telestaff:Cookies", "");
@@ -126,12 +124,8 @@ namespace Dievas.Services {
 
             try {
                 _logger.LogInformation("TelestaffBackgroundService: Fetching Telestaff Roster...");
-                foreach (DateTime date in dates){
-                    StaffingRoster roster = fetchTelestaffRoster(date.ToString(_config["Telestaff:TimeFormat"]));
-                    StaffingCache cachedRoster = new StaffingCache(roster, Convert.ToDouble(_config["Telestaff:ExpirationTimeInMinutes"]));
-
-                    StaffingSingleton.Instance.AddRoster(cachedRoster, date);
-                }
+                var fetchTasks = dates.Select(date => FetchAndCacheRosterAsync(date));
+                await Task.WhenAll(fetchTasks);
                 _logger.LogInformation("TelestaffBackgroundService: Roster updated from Telestaff successfully.");
 
             } catch (Exception ex) {
@@ -139,10 +133,22 @@ namespace Dievas.Services {
             }
 
             try {
-                    StaffingSingleton.Instance.CleanRosters();
-            }  catch (Exception ex) {
+                _logger.LogTrace("Cleaning old rosters fromt Telestaff Cache.");
+                List<DateTime> removedDates = StaffingSingleton.Instance.CleanRosters();
+                _logger.LogTrace("Removed {Count} old rosters from Telestaff Cache.", removedDates.Count);
+            } catch (Exception ex) {
                 _logger.LogError(ex, "Error pruning old rosters from Telestaff: {Message}", ex.Message);
             }
+        }
+
+        /// <summary>
+        ///     Fetches Telestaff Roster Data from the API and updates the singleton instance.
+        /// </summary>
+        /// <param name="date">DateTime Representing the date to fetch a roster for</param>
+        private async Task FetchAndCacheRosterAsync(DateTime date) {
+            StaffingRoster roster = await fetchTelestaffRosterAsync(date.ToString(_config["Telestaff:TimeFormat"]));
+            StaffingCache cachedRoster = new StaffingCache(roster, Convert.ToDouble(_config["Telestaff:ExpirationTimeInMinutes"]));
+            StaffingSingleton.Instance.AddRoster(cachedRoster, date);
         }
 
         /// <summary>
@@ -151,9 +157,7 @@ namespace Dievas.Services {
         /// <param name="endpoint">Relative URL for TS API endpoint</param>
         /// <param name="opts">Options to pass to the TS API</param>
         /// <returns> JSON formated string representation of the staffing information or </returns>
-        private string fetchString(string endpoint, string opts="{}") {
-
-            string apiResponse = "";
+        private async Task<string> FetchStringAsync(string endpoint, string opts="{}") {
             try {
                 var requestString = new StringContent(
                     opts,
@@ -163,17 +167,24 @@ namespace Dievas.Services {
 
                 _logger.LogInformation($"TelestaffBackgroundService: Fetching Telestaff {endpoint} with options {opts}.");
 
-                HttpResponseMessage result = _http.PostAsync(
-                    endpoint,
-                    requestString).Result;
-
-                apiResponse = result.Content.ReadAsStringAsync().Result;
+                var result = await _http.PostAsync(endpoint, requestString);
+                return await result.Content.ReadAsStringAsync();
 
             } catch (Exception e) {
                 _logger.LogError(e, e.Message);
+                return "";
             }
+        }
 
-            return apiResponse;
+        /// <summary>
+        ///     Fetches Information from Telestaff's API and returns it as a JSON Object
+        /// </summary>
+        /// <param name="endpoint">Relative URL for TS API endpoint</param>
+        /// <param name="opts">Options to pass to the TS API</param>
+        /// <returns> JSON Object representation of the staffing information </returns>
+        private async Task<JObject> FetchJObjectAsync(string endpoint, string opts="{}") {
+            string apiResponse = await FetchStringAsync(endpoint, opts);
+            return JObject.Parse(apiResponse);
         }
 
         /// <summary>
@@ -181,11 +192,42 @@ namespace Dievas.Services {
         /// </summary>
         /// <param name="endpoint">Relative URL for TS API endpoint</param>
         /// <param name="opts">Options to pass to the TS API</param>
+        /// <returns> JSON formated string representation of the staffing information or </returns>
+        // private string fetchString(string endpoint, string opts="{}") {
+
+        //     string apiResponse = "";
+        //     try {
+        //         var requestString = new StringContent(
+        //             opts,
+        //             System.Text.Encoding.UTF8,
+        //             "application/json"
+        //         );
+
+        //         _logger.LogInformation($"TelestaffBackgroundService: Fetching Telestaff {endpoint} with options {opts}.");
+
+        //         HttpResponseMessage result = _http.PostAsync(
+        //             endpoint,
+        //             requestString).Result;
+
+        //         apiResponse = result.Content.ReadAsStringAsync().Result;
+
+        //     } catch (Exception e) {
+        //         _logger.LogError(e, e.Message);
+        //     }
+
+        //     return apiResponse;
+        // }
+
+        /// <summary>
+        ///     Fetches Information from Telestaff's API and returns it as a JSON string
+        /// </summary>
+        /// <param name="endpoint">Relative URL for TS API endpoint</param>
+        /// <param name="opts">Options to pass to the TS API</param>
         /// <returns> JSON Object representation of the staffing information </returns>
-        private JObject fetchJObject(string endpoint, string opts="{}") {
-            string apiResponse = fetchString(endpoint, opts);
-            return JObject.Parse(apiResponse);
-        }
+        // private JObject fetchJObject(string endpoint, string opts="{}") {
+        //     string apiResponse = fetchString(endpoint, opts);
+        //     return JObject.Parse(apiResponse);
+        // }
 
         /// <summary>
         ///     Fetches Schedule Information from Telestaff's API
@@ -193,7 +235,7 @@ namespace Dievas.Services {
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <param name="startDate">string Representing the date of the first roster when fetching multiple rosters</param>
         /// <param name="endDate">string Representing the date of the last roster when fetching multiple rosters</param>
-        private List<DaySchedule> fetchSchedule(string date = "",
+        private async Task<List<DaySchedule>> fetchScheduleAsync(string date = "",
                                                 string startDate = "",
                                                 string endDate = "") {
 
@@ -211,7 +253,7 @@ namespace Dievas.Services {
                 endDate = date;
             }
 
-            JObject scheduleJsonObj = fetchJObject(
+            JObject scheduleJsonObj = await FetchJObjectAsync(
                 TS.ScheduleEndpoint,
                 $"{{\"fromDate\":\"{startDate}\",\"thruDate\":\"{endDate}\"}}"
             );
@@ -229,7 +271,7 @@ namespace Dievas.Services {
         /// </summary>
         /// <param name="date">string Representing the date to fetch staffing information for</param>
         /// <returns> List of <paramref name="PersonSchedule"/> objects representing staffing for <paramref name="date"/>.</returns>
-        private List<PersonSchedule> fetchAllPersonSchedules(string date = "") {
+        private async Task<List<PersonSchedule>> fetchAllPersonSchedulesAsync(string date = "") {
 
             // Ensure we have a date
             if (string.IsNullOrWhiteSpace(date)) {
@@ -241,7 +283,8 @@ namespace Dievas.Services {
             string opts = $"{{\"fromDate\":\"{date}\",\"thruDate\":\"{date}\"}}";
 
             // Fetch data as JSON from Telestaff API - since this is only a single day, we only care about the first record
-            JToken scheduleJsonObj = fetchJObject(TS.ScheduleEndpoint, opts)["schedules"][0];
+            var scheduleJsonObjs = await FetchJObjectAsync(TS.ScheduleEndpoint, opts);
+            JToken scheduleJsonObj = scheduleJsonObjs["schedules"][0];
 
             // This will form the basis of our response
             List<PersonSchedule> schedules = new List<PersonSchedule>();
@@ -260,7 +303,7 @@ namespace Dievas.Services {
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <param name="startDate">string Representing the date of the first roster when fetching multiple rosters</param>
         /// <param name="endDate">string Representing the date of the last roster when fetching multiple rosters</param>
-        private List<Roster> fetchRoster(string date = "",
+        private async Task<List<Roster>> fetchRosterAsync(string date = "",
                                           string startDate = "",
                                           string endDate = "") {
 
@@ -282,7 +325,7 @@ namespace Dievas.Services {
 
 
             _logger.LogInformation($"TelestaffBackgroundService: Fetching Roster from {opts}.");
-            string rosterData = fetchString(TS.RosterEndpoint, opts);
+            string rosterData = await FetchStringAsync(TS.RosterEndpoint, opts);
 
             JObject rosterJsonObj = JObject.Parse(rosterData);
 
@@ -301,8 +344,8 @@ namespace Dievas.Services {
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <param name="startDate">string Representing the date of the first roster when fetching multiple rosters</param>
         /// <param name="endDate">string Representing the date of the last roster when fetching multiple rosters</param>
-        private List<PositionNode> fetchPositions() {
-            JObject postionsJsonObj = fetchJObject(TS.PositionsEndpoint);
+        private async Task<List<PositionNode>> fetchPositionsAsync() {
+            JObject postionsJsonObj = await FetchJObjectAsync(TS.PositionsEndpoint);
 
             List<PositionNode> positions = new List<PositionNode>();
 
@@ -320,10 +363,10 @@ namespace Dievas.Services {
         /// <param name="orgnizationType">string Representing TS Type of the Organization ['INSTITUTION/AGENCY/REGION/STATION/UNIT']</param>
         /// <param name="enabled">boolean if set to true only returns enabled nodes</param>
         /// <returns> Dictonary of <paramref name="OrganizationNodes"/> keyed by organizational ID</returns>
-        private List<OrganizationNode> fetchOrganizationLevel(string organizationType, bool enabled=true) {
+        private async Task<List<OrganizationNode>> fetchOrganizationLevelAsync(string organizationType, bool enabled=true) {
             List<OrganizationNode> organizations = new List<OrganizationNode>();
             string requestJson = $"{{\"type\": \"{organizationType}\"}}";
-            JObject organizationJObject = fetchJObject(TS.OrginizationEndpoint, requestJson);
+            JObject organizationJObject = await FetchJObjectAsync(TS.OrginizationEndpoint, requestJson);
             _logger.LogInformation($"TelestaffBackgroundService: Fetching {organizationType} nodes from Telestaff");
             foreach (JToken organizationJson in organizationJObject["organizationNodes"]) {
                 if (enabled){
@@ -345,7 +388,7 @@ namespace Dievas.Services {
         /// <param name="enabled">boolean if set to true only returns enabled nodes</param>
         /// <returns> Dictonary of <paramref name="OrganizationNodes"/> keyed by organizational ID</returns>
         /// <exception cref="ArgumentException">If nodeType is not a known organization level ['INSTITUTION/AGENCY/REGION/STATION/UNIT'].</exception>
-        private List<OrganizationNode> fetchActiveNodes(string nodeType="UNIT") {
+        private async Task<List<OrganizationNode>> fetchActiveNodesAsync(string nodeType="UNIT") {
             List<OrganizationNode> nodes = new List<OrganizationNode>();
 
             if (!TS.IsValidOrganizationNode(nodeType)){
@@ -355,7 +398,7 @@ namespace Dievas.Services {
             List<int> activeIds = new List<int>();
 
             for (int ndx = 0; ndx < TS.OrganizationNodes.Length; ndx++){
-                nodes = fetchOrganizationLevel(TS.OrganizationNodes[ndx])
+                nodes = (await fetchOrganizationLevelAsync(TS.OrganizationNodes[ndx]))
                             .FindAll(u => u.Enabled && (ndx == 0 || activeIds.Contains(u.Parent.ParentId)));
 
                 // If this is the org level we care about return the results
@@ -372,11 +415,11 @@ namespace Dievas.Services {
         /// <param name="date">string Representing the date to fetch a roster for</param>
         /// <param name="startDate">string Representing the date of the first roster when fetching multiple rosters</param>
         /// <param name="endDate">string Representing the date of the last roster when fetching multiple rosters</param>
-        private StaffingRoster fetchTelestaffRoster(string staffingDate="") {
+        private async Task<StaffingRoster> fetchTelestaffRosterAsync(string staffingDate="") {
 
-            Roster roster = fetchRoster(staffingDate)[0];
-            List<PersonSchedule> schedules = fetchAllPersonSchedules(staffingDate);
-            DaySchedule staffingSchedule = fetchSchedule(staffingDate)[0];
+            Roster roster = (await fetchRosterAsync(staffingDate))[0];
+            List<PersonSchedule> schedules = await fetchAllPersonSchedulesAsync(staffingDate);
+            DaySchedule staffingSchedule = (await fetchScheduleAsync(staffingDate))[0];
             List<StaffingRecord> records = new List<StaffingRecord>();
 
             foreach (RosterRecord rosterRecord in roster.Records) {
