@@ -33,7 +33,7 @@ namespace Dievas.Models.WeatherForecast {
         [JsonPropertyName("windSpeed")]
         public string windSpeed { get; set; }
 
-        [JsonPropertyName("windDirectio")]
+        [JsonPropertyName("windDirection")]
         public string windDirection { get; set; }
 
         [JsonPropertyName("icon")]
