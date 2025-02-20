@@ -106,8 +106,11 @@ namespace Dievas.Controllers {
             StaffingCache? staffingRoster = staffingData.getRoster(date);
 
             if (staffingRoster == null) {
-                _logger.LogError($"Error loading staffing roster for {date}.");
+                _logger.LogWarning($"Roster for {date.ToString("MM/dd/yyyy")} not found in cache.");
+                // Return an empty roster as fallback
+                return new StaffingRoster(date, new List<StaffingRecord>());
             }
+            
             StaffingRoster roster = staffingRoster.Roster;
             return filterRosterByStation(roster, station, offRoster, telestaffOnly);
         }
