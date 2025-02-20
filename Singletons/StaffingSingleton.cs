@@ -60,6 +60,7 @@ namespace Dievas.Services
         /// Clean up old Staffing Data
         /// </summary>
         public void cleanRosters() {
+            DateTime now = DateTime.Now.Date;
             var keysToRemove = rosters.Keys
                 .Where(date => DateTime.Compare(now, date) > 0)
                 .ToList();
