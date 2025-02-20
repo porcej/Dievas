@@ -34,7 +34,7 @@ namespace Dievas.Services
         /// <param name="forecasts">The weather forecast.</param>
         public void UpdateWeather(NWSForecast forecast) {
             Forecast = forecast;
-            // LastUpdated = lastUpdated;
+            LastUpdated = DateTime.UtcNow;  // Set LastUpdated to current UTC time
         }
     }
 }
