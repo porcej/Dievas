@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Dievas.Hubs;
+using Dievas.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -34,6 +35,8 @@ namespace Dievas {
                                     });
             });
             services.AddSignalR();
+            services.AddHostedService<WeatherForecastBackgroundService>();
+            services.AddHostedService<TelestaffBackgroundService>();
             services.AddSingleton<IConfiguration>(Configuration);
             services.AddSingleton<CAD>();
         }
