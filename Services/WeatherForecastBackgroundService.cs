@@ -102,8 +102,20 @@ namespace Dievas.Services {
         /// <inheritdoc />
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
             while (!stoppingToken.IsCancellationRequested) {
-                await FetchWeatherAsync();
-                await Task.Delay(_updateInterval, stoppingToken);
+                try {
+                    await FetchWeatherAsync();
+                } catch (Exception ex) {
+                    _logger.LogError(ex, "Unexpected error in WeatherForecastBackgroundService main loop: {Message}", ex.Message);
+                    // Continue running even if there's an error
+                }
+                
+                try {
+                    await Task.Delay(_updateInterval, stoppingToken);
+                } catch (TaskCanceledException) {
+                    // Expected when cancellation is requested
+                    _logger.LogInformation("WeatherForecastBackgroundService is stopping.");
+                    break;
+                }
             }
         }
 
@@ -113,7 +125,21 @@ namespace Dievas.Services {
         private async Task FetchWeatherAsync() {
             try {
                 _logger.LogInformation("Fetching weather forecast...");
-                var nwsResponse = await _http.GetStringAsync(_weatherApiEndPoint);
+                
+                var response = await _http.GetAsync(_weatherApiEndPoint);
+                
+                if (!response.IsSuccessStatusCode) {
+                    _logger.LogWarning("Weather API returned status code {StatusCode}", response.StatusCode);
+                    return;
+                }
+                
+                var nwsResponse = await response.Content.ReadAsStringAsync();
+                
+                if (string.IsNullOrWhiteSpace(nwsResponse)) {
+                    _logger.LogWarning("Weather API returned empty response");
+                    return;
+                }
+                
                 var weatherData = JsonSerializer.Deserialize<NWSWeatherForecastResponse>(nwsResponse, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 if (weatherData?.Properties != null) {
@@ -123,9 +149,18 @@ namespace Dievas.Services {
                     _logger.LogWarning("Received invalid weather data.");
                 }
             }
+            catch (HttpRequestException ex) {
+                _logger.LogError(ex, "Network error fetching weather forecast: {Message}", ex.Message);
+            }
+            catch (TaskCanceledException ex) {
+                _logger.LogWarning(ex, "Request timeout fetching weather forecast");
+            }
+            catch (JsonException ex) {
+                _logger.LogError(ex, "Error parsing weather forecast JSON: {Message}", ex.Message);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching weather forecast.");
+                _logger.LogError(ex, "Unexpected error fetching weather forecast: {Message}", ex.Message);
             }
         }
     }

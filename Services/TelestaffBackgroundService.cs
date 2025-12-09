@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Dievas.Models;
 using Dievas.Models.Telestaff;
@@ -100,6 +101,7 @@ namespace Dievas.Services {
             // Read interval from appsettings.json, defaulting to default interval if not provided
             int intervalMinutes = _config.GetValue<int>("Telestaff:UpdateIntervalMinutes", DefaultUpdateIntervalMinutes);
             _logger.LogInformation($"TelestaffBackgroundService: Telestaff update interval set to {intervalMinutes} minutes.");
+            _logger.LogInformation($"TelestaffBackgroundService: Trace logging enabled: {_logger.IsEnabled(LogLevel.Trace)}");
             _updateInterval = TimeSpan.FromMinutes(intervalMinutes);
 
         }
@@ -107,8 +109,20 @@ namespace Dievas.Services {
         /// <inheritdoc />
         protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
             while (!stoppingToken.IsCancellationRequested) {
-                await FetchTelestaffAsync();
-                await Task.Delay(_updateInterval, stoppingToken);
+                try {
+                    await FetchTelestaffAsync();
+                } catch (Exception ex) {
+                    _logger.LogError(ex, "Unexpected error in TelestaffBackgroundService main loop: {Message}", ex.Message);
+                    // Continue running even if there's an error
+                }
+                
+                try {
+                    await Task.Delay(_updateInterval, stoppingToken);
+                } catch (TaskCanceledException) {
+                    // Expected when cancellation is requested
+                    _logger.LogInformation("TelestaffBackgroundService is stopping.");
+                    break;
+                }
             }
         }
 
@@ -146,9 +160,14 @@ namespace Dievas.Services {
         /// </summary>
         /// <param name="date">DateTime Representing the date to fetch a roster for</param>
         private async Task FetchAndCacheRosterAsync(DateTime date) {
-            StaffingRoster roster = await fetchTelestaffRosterAsync(date.ToString(_config["Telestaff:TimeFormat"]));
-            StaffingCache cachedRoster = new StaffingCache(roster, Convert.ToDouble(_config["Telestaff:ExpirationTimeInMinutes"]));
-            StaffingSingleton.Instance.AddRoster(cachedRoster, date);
+            try {
+                StaffingRoster roster = await fetchTelestaffRosterAsync(date.ToString(_config["Telestaff:TimeFormat"]));
+                StaffingCache cachedRoster = new StaffingCache(roster, Convert.ToDouble(_config["Telestaff:ExpirationTimeInMinutes"]));
+                StaffingSingleton.Instance.AddRoster(cachedRoster, date);
+            } catch (Exception ex) {
+                _logger.LogError(ex, "Error fetching and caching roster for date {Date}: {Message}", date.ToString("yyyy-MM-dd"), ex.Message);
+                // Don't rethrow - allow other dates to be fetched
+            }
         }
 
         /// <summary>
@@ -156,7 +175,7 @@ namespace Dievas.Services {
         /// </summary>
         /// <param name="endpoint">Relative URL for TS API endpoint</param>
         /// <param name="opts">Options to pass to the TS API</param>
-        /// <returns> JSON formated string representation of the staffing information or </returns>
+        /// <returns> JSON formated string representation of the staffing information or empty string on error</returns>
         private async Task<string> FetchStringAsync(string endpoint, string opts="{}") {
             try {
                 var requestString = new StringContent(
@@ -166,12 +185,39 @@ namespace Dievas.Services {
                 );
 
                 _logger.LogInformation($"TelestaffBackgroundService: Fetching Telestaff {endpoint} with options {opts}.");
+                
+                if (_logger.IsEnabled(LogLevel.Trace)) {
+                    _logger.LogTrace("Telestaff Request - Endpoint: {Endpoint}, Request Body: {RequestBody}", endpoint, opts);
+                }
 
                 var result = await _http.PostAsync(endpoint, requestString);
-                return await result.Content.ReadAsStringAsync();
+                string content = await result.Content.ReadAsStringAsync();
+                
+                if (_logger.IsEnabled(LogLevel.Trace)) {
+                    _logger.LogTrace("Telestaff Response - Endpoint: {Endpoint}, Status: {StatusCode}, Response Body: {ResponseBody}", 
+                        endpoint, result.StatusCode, content);
+                }
+                
+                if (!result.IsSuccessStatusCode) {
+                    _logger.LogWarning($"Telestaff API returned status code {result.StatusCode} for endpoint {endpoint}");
+                    return "";
+                }
+                
+                if (string.IsNullOrWhiteSpace(content)) {
+                    _logger.LogWarning($"Telestaff API returned empty response for endpoint {endpoint}");
+                    return "";
+                }
+                
+                return content;
 
+            } catch (HttpRequestException ex) {
+                _logger.LogError(ex, "Network error fetching from Telestaff {endpoint}: {Message}", endpoint, ex.Message);
+                return "";
+            } catch (TaskCanceledException ex) {
+                _logger.LogWarning(ex, "Request timeout fetching from Telestaff {endpoint}", endpoint);
+                return "";
             } catch (Exception e) {
-                _logger.LogError(e, e.Message);
+                _logger.LogError(e, "Unexpected error fetching from Telestaff {endpoint}: {Message}", endpoint, e.Message);
                 return "";
             }
         }
@@ -181,10 +227,31 @@ namespace Dievas.Services {
         /// </summary>
         /// <param name="endpoint">Relative URL for TS API endpoint</param>
         /// <param name="opts">Options to pass to the TS API</param>
-        /// <returns> JSON Object representation of the staffing information </returns>
+        /// <returns> JSON Object representation of the staffing information, or empty JObject on error</returns>
         private async Task<JObject> FetchJObjectAsync(string endpoint, string opts="{}") {
             string apiResponse = await FetchStringAsync(endpoint, opts);
-            return JObject.Parse(apiResponse);
+            
+            if (string.IsNullOrWhiteSpace(apiResponse)) {
+                _logger.LogWarning("FetchJObjectAsync: Empty response for endpoint {Endpoint}, returning empty JObject", endpoint);
+                return new JObject();
+            }
+            
+            try {
+                JObject jsonObj = JObject.Parse(apiResponse);
+                
+                // Check for Telestaff API failure response
+                JToken successToken = jsonObj["success"];
+                if (successToken != null && successToken.Type == JTokenType.Boolean && !successToken.Value<bool>()) {
+                    string message = jsonObj["message"]?.Value<string>() ?? "Unknown error";
+                    _logger.LogError("Telestaff API failure for endpoint {Endpoint}: {Message}", endpoint, message);
+                    return new JObject();
+                }
+                
+                return jsonObj;
+            } catch (JsonReaderException ex) {
+                _logger.LogError(ex, "Failed to parse JSON for endpoint {Endpoint}. Response length: {Length}", endpoint, apiResponse.Length);
+                return new JObject();
+            }
         }
 
         /// <summary>
@@ -260,8 +327,10 @@ namespace Dievas.Services {
 
             List<DaySchedule> schedules = new List<DaySchedule>();
 
-            foreach (JToken scheduleJson in scheduleJsonObj["schedules"]) {
-                schedules.Add(scheduleJson.ToObject<DaySchedule>());
+            if (scheduleJsonObj["schedules"] != null) {
+                foreach (JToken scheduleJson in scheduleJsonObj["schedules"]) {
+                    schedules.Add(scheduleJson.ToObject<DaySchedule>());
+                }
             }
             return schedules;
         }
@@ -284,14 +353,24 @@ namespace Dievas.Services {
 
             // Fetch data as JSON from Telestaff API - since this is only a single day, we only care about the first record
             var scheduleJsonObjs = await FetchJObjectAsync(TS.ScheduleEndpoint, opts);
+            
+            if (scheduleJsonObjs["schedules"] == null || !scheduleJsonObjs["schedules"].Any()) {
+                _logger.LogWarning("No schedules found in response for date {Date}", date);
+                return new List<PersonSchedule>();
+            }
+            
             JToken scheduleJsonObj = scheduleJsonObjs["schedules"][0];
 
             // This will form the basis of our response
             List<PersonSchedule> schedules = new List<PersonSchedule>();
 
-            foreach (JToken scheduleJson in scheduleJsonObj["schedule"]) {
-                foreach (JToken personScheduleJson in scheduleJson["personSchedule"]){
-                    schedules.Add(personScheduleJson.ToObject<PersonSchedule>());
+            if (scheduleJsonObj["schedule"] != null) {
+                foreach (JToken scheduleJson in scheduleJsonObj["schedule"]) {
+                    if (scheduleJson["personSchedule"] != null) {
+                        foreach (JToken personScheduleJson in scheduleJson["personSchedule"]){
+                            schedules.Add(personScheduleJson.ToObject<PersonSchedule>());
+                        }
+                    }
                 }
             }
             return schedules;
@@ -327,15 +406,35 @@ namespace Dievas.Services {
             _logger.LogInformation($"TelestaffBackgroundService: Fetching Roster from {opts}.");
             string rosterData = await FetchStringAsync(TS.RosterEndpoint, opts);
 
-            JObject rosterJsonObj = JObject.Parse(rosterData);
-
-            List<Roster> rosters = new List<Roster>();
-
-            foreach (JToken rosterJson in rosterJsonObj["rosters"]) {
-                rosters.Add(rosterJson.ToObject<Roster>());
+            if (string.IsNullOrWhiteSpace(rosterData)) {
+                _logger.LogWarning("TelestaffBackgroundService: Received empty roster data, returning empty list.");
+                return new List<Roster>();
             }
 
-            return rosters;
+            try {
+                JObject rosterJsonObj = JObject.Parse(rosterData);
+
+                // Check for Telestaff API failure response
+                JToken successToken = rosterJsonObj["success"];
+                if (successToken != null && successToken.Type == JTokenType.Boolean && !successToken.Value<bool>()) {
+                    string message = rosterJsonObj["message"]?.Value<string>() ?? "Unknown error";
+                    _logger.LogError("Telestaff API failure for roster endpoint: {Message}", message);
+                    return new List<Roster>();
+                }
+
+                List<Roster> rosters = new List<Roster>();
+
+                if (rosterJsonObj["rosters"] != null) {
+                    foreach (JToken rosterJson in rosterJsonObj["rosters"]) {
+                        rosters.Add(rosterJson.ToObject<Roster>());
+                    }
+                }
+
+                return rosters;
+            } catch (JsonReaderException ex) {
+                _logger.LogError(ex, "Failed to parse roster JSON data. Data length: {Length}", rosterData?.Length ?? 0);
+                return new List<Roster>();
+            }
         }
 
         /// <summary>
@@ -417,9 +516,22 @@ namespace Dievas.Services {
         /// <param name="endDate">string Representing the date of the last roster when fetching multiple rosters</param>
         private async Task<StaffingRoster> fetchTelestaffRosterAsync(string staffingDate="") {
 
-            Roster roster = (await fetchRosterAsync(staffingDate))[0];
+            List<Roster> rosters = await fetchRosterAsync(staffingDate);
+            if (rosters == null || rosters.Count == 0) {
+                _logger.LogWarning("No rosters returned for date {Date}, returning empty StaffingRoster", staffingDate);
+                return new StaffingRoster(DateTime.Today, new List<StaffingRecord>());
+            }
+
+            Roster roster = rosters[0];
             List<PersonSchedule> schedules = await fetchAllPersonSchedulesAsync(staffingDate);
-            DaySchedule staffingSchedule = (await fetchScheduleAsync(staffingDate))[0];
+            
+            List<DaySchedule> daySchedules = await fetchScheduleAsync(staffingDate);
+            if (daySchedules == null || daySchedules.Count == 0) {
+                _logger.LogWarning("No schedules returned for date {Date}, returning empty StaffingRoster", staffingDate);
+                return new StaffingRoster(DateTime.Today, new List<StaffingRecord>());
+            }
+            
+            DaySchedule staffingSchedule = daySchedules[0];
             List<StaffingRecord> records = new List<StaffingRecord>();
 
             foreach (RosterRecord rosterRecord in roster.Records) {
@@ -434,7 +546,15 @@ namespace Dievas.Services {
                 } else {
 
                     // Find the person's schedule
-                    Schedule personSchedule = staffingSchedule.Schedule.Find(s => s.Person.EmployeeId.ToString() == record.Badge);
+                    Schedule personSchedule = staffingSchedule.Schedule?.Find(s => s.Person?.EmployeeId.ToString() == record.Badge);
+
+                    if (personSchedule == null || personSchedule.PersonSchedule == null) {
+                        record.Id = -2;
+                        record.Title = "";
+                        record.PositionDisplayName = "";
+                        records.Add(record);
+                        continue;
+                    }
 
                     // PersonSchedule thisSchedule = schedules.Find(t => t.StaffingNoIn == rosterRecord.StaffingNoIn);
                     PersonSchedule thisSchedule = personSchedule.PersonSchedule.Find(
