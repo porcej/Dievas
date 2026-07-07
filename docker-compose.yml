@@ -1,0 +1,27 @@
+services:
+  dievas:
+    build: .
+    ports:
+      - "${DIEVAS_HOST_PORT:-8080}:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ASPNETCORE_URLS: http://+:8080
+      Urls: http://+:8080
+      UseHttpsRedirection: "false"
+      Origins: ${Origins:-http://localhost:8080}
+      AppName: ${AppName:-Dievas}
+      Version: ${Version:-1.0}
+      NWS__Url: ${NWS__Url:-https://api.weather.gov/}
+      NWS__ForecastEndpoint: ${NWS__ForecastEndpoint:-gridpoints/LWX/96,66/forecast}
+      NWS__User-agent: "(Dievas, docker)"
+      NWS__UpdateIntervalMinutes: ${NWS__UpdateIntervalMinutes:-15}
+      Telestaff__Url: ${Telestaff__Url:-https://example.com}
+      Telestaff__User-agent: "(Dievas, docker)"
+      Telestaff__TimeFormat: ${Telestaff__TimeFormat:-yyyy-MM-dd}
+      Telestaff__UpdateIntervalMinutes: ${Telestaff__UpdateIntervalMinutes:-15}
+      Telestaff__ExpirationTimeInMinutes: ${Telestaff__ExpirationTimeInMinutes:-15}
+      Telestaff__Username: ${Telestaff__Username:-}
+      Telestaff__Password: ${Telestaff__Password:-}
+      Telestaff__AllowInvalidCertificates: ${Telestaff__AllowInvalidCertificates:-false}
+      ConnectionStrings__CAD_Reporting: ${ConnectionStrings__CAD_Reporting:-}
+    restart: unless-stopped

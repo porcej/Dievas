@@ -70,7 +70,9 @@ namespace Dievas {
                     .AllowCredentials()
             );
 
-            app.UseHttpsRedirection();
+            if (Configuration.GetValue("UseHttpsRedirection", true)) {
+                app.UseHttpsRedirection();
+            }
 
             app.UseRouting();
 
