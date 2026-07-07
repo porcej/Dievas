@@ -1,5 +1,5 @@
 {
-  "Urls": "https://localhost:5001;http://localhost:5002;https://fire-173822vma.alexgov.net:5001;http://fire-173822vma.alexgov.net:5002;",
+  "Urls": "https://localhost:5001;http://localhost:5000",
   "Logging": {
     "LogLevel": {
       "Default": "Debug",
@@ -16,27 +16,32 @@
     }
   },
   "ConnectionStrings": {
-    "CAD_Reporting": "Server=DECWHL01RPT01;Database=Reporting_System;Trusted_Connection=True;"
+    "CAD_Reporting": "Server=localhost;Database=Reporting_System;Trusted_Connection=True;"
   },
   "SwaggerEndpoint": "/swagger/v1/swagger.json",
   "AllowedHosts": "*",
-  "Origins": "http://localhost:8080;http://fire-173822vma.alexgov.net:8080;http://fire-173822vma.local:8080",
+  "Origins": "http://localhost:8080",
   "NWS": {
     "Url": "https://api.weather.gov/",
     "ForecastEndpoint": "gridpoints/LWX/96,66/forecast",
-    "User-agent": "(Stack Weather, kt3i.com)"
+    "User-agent": "(Dievas, local-dev)",
+    "UpdateIntervalMinutes": 15,
+    "AllowInvalidCertificates": false
   },
   "Telestaff": {
-    "Url": "https://telestaff.alexandriava.gov",
-    "User-agent": "(Stack Weather, kt3i.com)",
+    "Url": "https://example.com",
+    "User-agent": "(Dievas, local-dev)",
     "TimeFormat": "yyyy-MM-dd",
-    "AllowInvalidCertificates": true,
+    "UpdateIntervalMinutes": 15,
     "ExpirationTimeInMinutes": 15,
+    "Username": "",
+    "Password": "",
+    "AllowInvalidCertificates": false
   },
   "TestHarness": {
-    "Enabled": true,
-    "Url": "https://sfireweb2.alexgov.net/DashboardApi/",
-    "User-agent": "(Stack Weather, kt3i.com)",
-    "AllowInvalidCertificates": false,
+    "Enabled": false,
+    "Url": "https://example.com/api/",
+    "User-agent": "(Dievas, local-dev)",
+    "AllowInvalidCertificates": false
   }
 }

@@ -12,20 +12,17 @@
   },
   "AllowedHosts": "*",
   "Origins": "http://localhost:8080",
-  "Version": "1.0",
-  "AppName": "Dievas",
-  "SwaggerEndpoint": "/swagger/v1/swagger.json",
   "UseHttpsRedirection": true,
   "NWS": {
-    "Url": "",
-    "ForecastEndpoint": "",
-    "User-agent": "",
-    "UpdateIntervalMinutes": 15,
+    "Url": "https://api.weather.gov/",
+    "ForecastEndpoint": "gridpoints/LWX/96,66/forecast",
+    "User-agent": "(Dievas, production)",
+    "UpdateIntervalMinutes": 60,
     "AllowInvalidCertificates": false
   },
   "Telestaff": {
-    "Url": "",
-    "User-agent": "",
+    "Url": "https://example.com",
+    "User-agent": "(Dievas, production)",
     "TimeFormat": "yyyy-MM-dd",
     "UpdateIntervalMinutes": 15,
     "ExpirationTimeInMinutes": 15,
@@ -38,10 +35,5 @@
     "Url": "",
     "User-agent": "",
     "AllowInvalidCertificates": false
-  },
-  "Hub": {
-    "HoursToKeepIncidents": 12.0,
-    "DatafeedHubName": "dataFeed",
-    "DashboardHubName": "dashboard"
   }
 }
