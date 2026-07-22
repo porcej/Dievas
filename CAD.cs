@@ -44,6 +44,7 @@ namespace Dievas {
 			if (_units.ContainsKey(radioName)) unit = _units[radioName];
 			
 			unit.StatusId = statusId;
+			unit.StatusUpdateTime = DateTime.UtcNow;
 			_units[radioName] = unit;		    
 		    
 		    return _units[radioName];
@@ -111,6 +112,7 @@ namespace Dievas {
 			UnitDto globalUnit = GetUnitByName(unit.RadioName);
 			globalUnit.StatusId = unit.StatusId;
 			globalUnit.StatusCode = unit.StatusCode;
+			globalUnit.StatusUpdateTime = unit.StatusUpdateTime;
             globalUnit.IncidentId = unit.IncidentId;
             AddOrUpdateUnit(globalUnit);
 
@@ -142,6 +144,7 @@ namespace Dievas {
                 RadioName = unit.RadioName,
                 StatusId = unit.StatusId,
 				StatusCode = unit.StatusCode,
+				StatusUpdateTime = unit.StatusUpdateTime,
                 IncidentId = id
             };
 
